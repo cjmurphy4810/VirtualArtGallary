@@ -1,48 +1,55 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Goth — Chris J. Murphy Virtual Museum</title>
+ <!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goth — Virtual Art Gallery of CJ Murphy</title>
 <style>
-  :root{ --wall:#3b0f10; --mat:#f9f7f2; }
-  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--wall);color:#f1e7d0}
-  header{padding:20px;text-align:center}
-  .breadcrumb{max-width:1200px;margin:0 auto;padding:0 20px}
-  .container{max-width:1200px;margin:0 auto;padding:20px}
-  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
-  figure{margin:0}
-  .frame{background:linear-gradient(#d4af37,#8b6b00);padding:14px;border-radius:10px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.35)}
-  .mat{background:var(--mat);padding:8px;border-radius:6px}
-  .art{width:100%;height:auto;display:block;border-radius:4px;cursor:pointer}
-  .caption{font-size:.9rem;line-height:1.35;color:#f5ead3;margin-top:8px;text-align:center}
-  dialog.lightbox{border:none;border-radius:10px;padding:0;max-width:min(92vw,1200px)}
-  .lightbox::backdrop{background:rgba(0,0,0,.8)}
-  .lb-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#111;color:#fff;border-radius:10px 10px 0 0}
-  .lb-close{background:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer}
-  .lb-img{width:100%;height:auto;display:block;border-radius:0 0 10px 10px}
-  footer{padding:30px 16px;color:#e6dac2;text-align:center}
-  a{color:inherit}
-</style>
-</head>
-<body>
-  <div class="breadcrumb"><a href="../index.html">← Museum Map</a></div>
-  <header><h1>Goth</h1><p>Shadow, mood, contrast.</p></header>
-  <main class="container"><section id="gallery" class="gallery" aria-live="polite"></section></main>
-  <dialog id="lightbox" class="lightbox" aria-label="Artwork viewer">
-    <div class="lb-head"><div id="lbTitle"></div><button id="lbClose" class="lb-close">Close</button></div>
-    <img id="lbImg" class="lb-img" alt="">
-  </dialog>
-  <footer>© 2025 Chris J. Murphy</footer>
+:root{
+  --bg1:#0b0b10; --bg2:#15131b; --ink:#f5f2ff; --muted:#c7b8ff;
+  --frame:#3a2a10; --gild:#a98735; --mat:#0f0e14; --matEdge:#2a2238;
+  --shadow:0 22px 56px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box} body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+   radial-gradient(1100px 700px at 30% 15%, rgba(120,0,160,.18), transparent 60%),
+   radial-gradient(900px 600px at 80% 80%, rgba(80,120,255,.12), transparent 60%),
+   linear-gradient(180deg,var(--bg1),var(--bg2))}
+header{text-align:center;padding:28px 16px 6px}
+header h1{margin:0;font-size:clamp(22px,3.5vw,34px)}
+header p{margin:6px 0 0;color:var(--muted)}
+.back{display:inline-block;margin:14px auto 28px;padding:9px 16px;background:#15131b;border:1px solid #423a54;border-radius:10px;color:#e8dcff;text-decoration:none}
+.back:hover{background:#1e1a27}
+.shell{max-width:1200px;margin:0 auto;padding:0 18px 72px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:34px}
+.card{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
+@media(max-width:860px){.card{grid-template-columns:1fr}}
+.frame{position:relative;display:block;cursor:pointer;border:10px solid var(--gild);border-radius:16px;
+  background:linear-gradient(180deg,#2d2112,#241a10);box-shadow:var(--shadow);overflow:hidden}
+.frame::before{content:"";position:absolute;inset:8px;border-radius:10px;background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#14121a 70%);
+  box-shadow:inset 0 0 0 2px #5a4520, inset 0 0 0 4px #c4a24f, inset 0 12px 24px rgba(0,0,0,.6)}
+.tile{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;margin:10px;z-index:1}
+.tile img{width:100%;height:100%;object-fit:cover;transition:transform .25s}
+@media(hover:hover){.frame:hover .tile img{transform:scale(1.06)}}
+.meta h3{margin:2px 0 6px}.meta .sub{margin:0 0 10px;color:#b8a4ff}.meta p{margin:0;color:#e6ddff}
+.lightbox{position:fixed;inset:0;display:none;place-items:center;background:rgba(5,4,8,.86);z-index:60}
+.lightbox.open{display:grid}.lightbox img{max-width:min(96vw,1600px);max-height:92vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.close{position:fixed;top:16px;right:18px;background:#221a0f;color:#fff;border:1px solid #8e6e33;padding:9px 12px;border-radius:10px;z-index:61}
+</style></head><body>
+<header>
+  <h1>Goth</h1><p>Velvet-dark walls and antique gold frames.</p>
+  <a class="back" href="../index.html">← Return to Lobby Map</a>
+</header>
+<div class="shell"><div id="cards" class="cards"></div></div>
+<div id="lb" class="lightbox"><button class="close" id="c">Close ✕</button><img id="img" alt=""></div>
 <script>
-const FILES = [
-  "IMG_0242.PNG","IMG_0276.PNG","IMG_6788.PNG","IMG_6793.PNG","IMG_6823.PNG","IMG_6834.PNG",
-  "IMG_0265.PNG","IMG_6787.PNG","IMG_6790.PNG","IMG_6821.PNG","IMG_6824.PNG"
-];
-function humanize(n){const b=n.replace(/\.[^.]+$/,'').replace(/[_\-]+/g,' ').replace(/(?<=[a-z])(?=[A-Z])/g,' ').replace(/\s+/g,' ').trim();return b.charAt(0).toUpperCase()+b.slice(1)}
-const g=document.getElementById('gallery'), lb=document.getElementById('lightbox'), im=document.getElementById('lbImg'), tt=document.getElementById('lbTitle'), cl=document.getElementById('lbClose');
-FILES.forEach(f=>{const t=humanize(f),fig=document.createElement('figure'),fr=document.createElement('div');fr.className='frame';const m=document.createElement('div');m.className='mat';const img=document.createElement('img');img.className='art';img.loading='lazy';img.alt=t;img.src=encodeURI('img/'+f);m.appendChild(img);fr.appendChild(m);fig.appendChild(fr);const cap=document.createElement('figcaption');cap.className='caption';cap.innerHTML=`<strong>${t}</strong>`;fig.appendChild(cap);g.appendChild(fig);img.addEventListener('click',()=>{im.src=encodeURI('img/'+f);im.alt=t;tt.textContent=t;lb.showModal();});});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&lb.open)lb.close();}); lb.addEventListener('click',e=>{const r=lb.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)lb.close();}); cl.addEventListener('click',()=>lb.close());
-</script>
-</body>
-</html>
-
+const FILES=["IMG_0242.PNG","IMG_0276.PNG","IMG_6788.PNG","IMG_6793.PNG","IMG_6823.PNG","IMG_6834.PNG","IMG_0265.PNG","IMG_6787.PNG","IMG_6790.PNG","IMG_6821.PNG","IMG_6824.PNG"];
+const DESCRIPTIONS={"IMG_0242.PNG":"A bloom that refuses daylight.","IMG_6823.PNG":"Wings over a midnight treeline."};
+const ROOM="Goth",cards=document.getElementById('cards');const pretty=f=>f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+for(const f of FILES){const t=pretty(f),src='img/'+encodeURIComponent(f),d=DESCRIPTIONS[f]||'Add commentary for this artwork.';
+const el=document.createElement('article');el.className='card';
+el.innerHTML=`<a href="#" class="frame" data-src="${src}" data-title="${t}"><div class="tile"><img src="${src}" alt="${t}"></div></a>
+<div class="meta"><h3>${t}</h3><p class="sub"><strong>${ROOM}</strong> · <code>${f}</code></p><p>${d}</p></div>`;
+el.querySelector('.frame').addEventListener('click',e=>{e.preventDefault();open(src,t)});cards.appendChild(el);}
+const lb=document.getElementById('lb'),im=document.getElementById('img');document.getElementById('c').onclick=close;
+lb.addEventListener('click',e=>{if(e.target===lb)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+function open(s,a){im.src=s;im.alt=a;lb.classList.add('open');document.body.style.overflow='hidden'}
+function close(){lb.classList.remove('open');im.src='';document.body.style.overflow=''}
+</script></body></html>
