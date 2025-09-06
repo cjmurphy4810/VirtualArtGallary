@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Virtual Art Gallery of CJ Murphy</title>
 <style>
-  :root { --bg:#f7f6f3; --guide:rgba(255,215,0,.16); --guideStroke:rgba(255,215,0,.85); }
+  :root { --bg:#f7f6f3; --guideFill:rgba(255,215,0,.16); --guideStroke:rgba(255,215,0,.85); }
   * { box-sizing:border-box }
   body { margin:0; background:var(--bg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#222 }
   header { text-align:center; padding:28px 14px 10px }
@@ -16,110 +16,109 @@
   .map-box { position:relative; width:100%; }
   .map-img { display:block; width:100%; height:auto; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.08) }
 
-  /* Invisible hotspots */
+  /* Invisible hotspots (click targets) */
   .hs {
     position:absolute; display:block; cursor:pointer;
-    background:transparent; border:none; outline:none;
-    border-radius:12px; /* rounded to roughly match your room corners */
+    background:transparent; border:none; outline:none; border-radius:12px;
     -webkit-tap-highlight-color: transparent;
   }
   .hs:focus { outline:none }
 
-  /* Debug overlay (press H to toggle) */
-  .dev .hs { background:var(--guide); border:2px dashed var(--guideStroke) }
-  .legend { max-width:1200px; margin:8px auto 0; padding:0 14px; color:#555; font-size:.95rem }
+  /* Optional debug overlay (press H to toggle) */
+  .dev .hs { background:var(--guideFill); border:2px dashed var(--guideStroke) }
+
+  /* Tooltip */
+  .tip {
+    position: fixed; z-index: 10; pointer-events: none;
+    background:#111; color:#fff; padding:6px 9px; border-radius:8px;
+    font-size:14px; line-height:1; box-shadow:0 6px 16px rgba(0,0,0,.22);
+    transform: translate(-50%, -120%); opacity:0; transition:opacity .12s ease;
+    white-space:nowrap;
+  }
+  .tip.show { opacity:1; }
   footer { text-align:center; color:#777; padding:26px 10px 34px }
 </style>
 </head>
 <body>
   <header>
     <h1>Virtual Art Gallery of CJ Murphy</h1>
-    <p>Click a room on the map to enter</p>
+    <p>Hover any room on the map, then click to enter</p>
   </header>
 
   <div class="wrap">
     <div class="map-box" id="mapBox">
       <img id="mapImg" class="map-img" src="assets/backgroundMuseum.jpg" alt="Museum map background">
 
-      <!-- Hotspots (percent-based; tuned to your screenshot) -->
+      <!-- Hotspots (percent-based). Animals was already correct; others adjusted to match your screenshots. -->
       <!-- Animals (top-left wide) -->
-      <a class="hs" href="room-Animals/index.html"
-         style="left:13%; top:16%; width:41%; height:18%;">
-        <span class="sr-only">Animals</span>
-      </a>
+      <a class="hs" data-label="Animals" href="room-Animals/index.html"
+         style="left:12.5%; top:16.0%; width:41.0%; height:18.0%;"></a>
 
-      <!-- Goth (upper middle-left small) -->
-      <a class="hs" href="room-Goth/index.html"
-         style="left:57%; top:19%; width:12%; height:16%;">
-        <span class="sr-only">Goth</span>
-      </a>
+      <!-- Goth (the teal panel just right of Animals) -->
+      <a class="hs" data-label="Goth" href="room-Goth/index.html"
+         style="left:56.0%; top:19.0%; width:12.5%; height:17.5%;"></a>
 
-      <!-- Landscapes & Nature (left middle) -->
-      <a class="hs" href="room-LandscapesAndNature/index.html"
-         style="left:16%; top:46%; width:22%; height:14%;">
-        <span class="sr-only">Landscapes & Nature</span>
-      </a>
+      <!-- Landscapes & Nature (green room lower-left of Animals) -->
+      <a class="hs" data-label="Landscapes & Nature" href="room-LandscapesAndNature/index.html"
+         style="left:16.5%; top:45.5%; width:23.0%; height:15.0%;"></a>
 
-      <!-- Life & People (right column tall) -->
-      <a class="hs" href="room-LifeAndPeople/index.html"
-         style="left:74%; top:18%; width:13%; height:34%;">
-        <span class="sr-only">Life & People</span>
-      </a>
+      <!-- Life & People (tall pink room on the right column) -->
+      <a class="hs" data-label="Life & People" href="room-LifeAndPeople/index.html"
+         style="left:73.8%; top:17.5%; width:13.8%; height:34.5%;"></a>
 
-      <!-- Mad Men (center) -->
-      <a class="hs" href="room-MadMen/index.html"
-         style="left:49%; top:56%; width:27%; height:14%;">
-        <span class="sr-only">Mad Men</span>
-      </a>
+      <!-- Mad Men (center, beneath Landscapes & Nature, with suit + martini) -->
+      <a class="hs" data-label="Mad Men" href="room-MadMen/index.html"
+         style="left:49.0%; top:55.0%; width:27.5%; height:15.5%;"></a>
 
-      <!-- Space & Universe (bottom center wide) -->
-      <a class="hs" href="room-SpaceAndUniverse/index.html"
-         style="left:36%; top:74%; width:42%; height:16%;">
-        <span class="sr-only">Space & Universe</span>
-      </a>
+      <!-- Space & Universe (long dark blue strip near bottom center-left) -->
+      <a class="hs" data-label="Space & Universe" href="room-SpaceAndUniverse/index.html"
+         style="left:35.5%; top:74.0%; width:43.0%; height:15.5%;"></a>
 
-      <!-- The Seas (bottom-right tall) -->
-      <a class="hs" href="room-TheSeas/index.html"
-         style="left:76%; top:66%; width:16%; height:26%;">
-        <span class="sr-only">The Seas</span>
-      </a>
+      <!-- The Seas (tall teal room bottom-right) -->
+      <a class="hs" data-label="The Seas" href="room-TheSeas/index.html"
+         style="left:75.8%; top:65.0%; width:17.0%; height:26.5%;"></a>
     </div>
-
-    <p class="legend">
-      Need to fine-tune? Press <strong>H</strong> to toggle a dashed overlay. While overlay is on,
-      clicking anywhere logs the <em>left / top</em> percentages in the browser console so you can adjust quickly.
-    </p>
   </div>
 
+  <div id="tooltip" class="tip" role="status" aria-live="polite"></div>
   <footer>© 2025 CJ Murphy</footer>
 
 <script>
-  // Dev overlay toggle + click-to-log coordinates (does not affect normal users)
+  // Tooltip on hover: "Click to enter the ‹Room› room"
   (function () {
-    let dev = false;
-    const body = document.body;
+    const tip = document.getElementById('tooltip');
     const box = document.getElementById('mapBox');
-    const img = document.getElementById('mapImg');
 
-    function toggleDev() {
-      dev = !dev;
-      body.classList.toggle('dev', dev);
-      console.log(dev ? 'Hotspot overlay: ON' : 'Hotspot overlay: OFF');
+    function showTip(e) {
+      const label = e.currentTarget.getAttribute('data-label');
+      tip.textContent = `Click to enter the ${label} room`;
+      tip.classList.add('show');
+    }
+    function moveTip(e) {
+      tip.style.left = e.clientX + 'px';
+      tip.style.top  = e.clientY + 'px';
+    }
+    function hideTip() {
+      tip.classList.remove('show');
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'h') toggleDev();
+    box.querySelectorAll('.hs').forEach(h => {
+      h.addEventListener('mouseenter', showTip);
+      h.addEventListener('mousemove', moveTip);
+      h.addEventListener('mouseleave', hideTip);
+      h.addEventListener('focus', showTip);
+      h.addEventListener('blur', hideTip);
     });
 
-    // When dev mode is on, clicking the image logs coordinates (percentages)
-    box.addEventListener('click', (e) => {
-      if (!dev) return;
-      e.preventDefault(); // prevent navigation while tuning
-      const rect = img.getBoundingClientRect();
-      const leftPct = ((e.clientX - rect.left) / rect.width) * 100;
-      const topPct  = ((e.clientY - rect.top)  / rect.height) * 100;
-      console.log(`left:${leftPct.toFixed(1)}%; top:${topPct.toFixed(1)}%`);
-    }, true);
+    // Developer overlay toggle (press H). Not visible to visitors unless you press H.
+    let dev = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'h') {
+        dev = !dev;
+        document.body.classList.toggle('dev', dev);
+        console.log(dev ? 'Hotspot overlay: ON' : 'Hotspot overlay: OFF');
+      }
+    });
   })();
 </script>
 </body>
