@@ -5,25 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Virtual Art Gallery of CJ Murphy</title>
 <style>
-  :root { --bg:#f7f6f3; --hover: rgba(255, 215, 0, .28); --ring:#111; }
+  :root { --bg:#f7f6f3; --guide:rgba(255,215,0,.16); --guideStroke:rgba(255,215,0,.85); }
   * { box-sizing:border-box }
-  body { margin:0; background:var(--bg); font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#222 }
+  body { margin:0; background:var(--bg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#222 }
   header { text-align:center; padding:28px 14px 10px }
-  header h1 { margin:0 0 6px; font-size: clamp(22px,3.5vw,36px); font-weight: 800 }
+  header h1 { margin:0 0 6px; font-size: clamp(22px,3.5vw,36px); font-weight:800 }
   header p  { margin:0; color:#666 }
 
   .wrap { max-width:1200px; margin:14px auto 40px; padding:0 12px }
   .map-box { position:relative; width:100%; }
-  /* The map image renders at its natural aspect ratio and scales responsively */
   .map-img { display:block; width:100%; height:auto; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.08) }
 
-  /* Hotspot anchors positioned as percentages over the image */
+  /* Invisible hotspots */
   .hs {
-    position:absolute; display:block;
-    outline:none; border:2px solid transparent; border-radius:12px;
+    position:absolute; display:block; cursor:pointer;
+    background:transparent; border:none; outline:none;
+    border-radius:12px; /* rounded to roughly match your room corners */
+    -webkit-tap-highlight-color: transparent;
   }
-  .hs:hover, .hs:focus { background:var(--hover); border-color:var(--ring); }
-  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,1px,1px); white-space:nowrap; border:0; }
+  .hs:focus { outline:none }
+
+  /* Debug overlay (press H to toggle) */
+  .dev .hs { background:var(--guide); border:2px dashed var(--guideStroke) }
   .legend { max-width:1200px; margin:8px auto 0; padding:0 14px; color:#555; font-size:.95rem }
   footer { text-align:center; color:#777; padding:26px 10px 34px }
 </style>
@@ -31,65 +34,93 @@
 <body>
   <header>
     <h1>Virtual Art Gallery of CJ Murphy</h1>
-    <p>Hover any room on the map, then click to enter</p>
+    <p>Click a room on the map to enter</p>
   </header>
 
   <div class="wrap">
     <div class="map-box" id="mapBox">
-      <img id="mapImg" class="map-img" src="backgroundMuseum.jpg" alt="Museum map background" />
+      <img id="mapImg" class="map-img" src="assets/backgroundMuseum.jpg" alt="Museum map background">
 
-      <!-- Hotspots (percent-based; tweak values to fit your exact artwork) -->
-      <!-- Animals (top-left wide room) -->
-      <a class="hs" href="room-Animals/index.html" style="left:7%; top:17%; width:38%; height:18%;">
-        <span class="sr-only">Enter: Animals</span>
+      <!-- Hotspots (percent-based; tuned to your screenshot) -->
+      <!-- Animals (top-left wide) -->
+      <a class="hs" href="room-Animals/index.html"
+         style="left:13%; top:16%; width:41%; height:18%;">
+        <span class="sr-only">Animals</span>
       </a>
 
       <!-- Goth (upper middle-left small) -->
-      <a class="hs" href="room-Goth/index.html" style="left:52%; top:18%; width:12%; height:16%;">
-        <span class="sr-only">Enter: Goth</span>
+      <a class="hs" href="room-Goth/index.html"
+         style="left:57%; top:19%; width:12%; height:16%;">
+        <span class="sr-only">Goth</span>
       </a>
 
       <!-- Landscapes & Nature (left middle) -->
-      <a class="hs" href="room-LandscapesAndNature/index.html" style="left:12%; top:43%; width:22%; height:14%;">
-        <span class="sr-only">Enter: Landscapes & Nature</span>
+      <a class="hs" href="room-LandscapesAndNature/index.html"
+         style="left:16%; top:46%; width:22%; height:14%;">
+        <span class="sr-only">Landscapes & Nature</span>
       </a>
 
       <!-- Life & People (right column tall) -->
-      <a class="hs" href="room-LifeAndPeople/index.html" style="left:81%; top:18%; width:14%; height:32%;">
-        <span class="sr-only">Enter: Life & People</span>
+      <a class="hs" href="room-LifeAndPeople/index.html"
+         style="left:74%; top:18%; width:13%; height:34%;">
+        <span class="sr-only">Life & People</span>
       </a>
 
       <!-- Mad Men (center) -->
-      <a class="hs" href="room-MadMen/index.html" style="left:52%; top:50%; width:26%; height:14%;">
-        <span class="sr-only">Enter: Mad Men</span>
+      <a class="hs" href="room-MadMen/index.html"
+         style="left:49%; top:56%; width:27%; height:14%;">
+        <span class="sr-only">Mad Men</span>
       </a>
 
       <!-- Space & Universe (bottom center wide) -->
-      <a class="hs" href="room-SpaceAndUniverse/index.html" style="left:38%; top:70%; width:42%; height:16%;">
-        <span class="sr-only">Enter: Space & Universe</span>
+      <a class="hs" href="room-SpaceAndUniverse/index.html"
+         style="left:36%; top:74%; width:42%; height:16%;">
+        <span class="sr-only">Space & Universe</span>
       </a>
 
       <!-- The Seas (bottom-right tall) -->
-      <a class="hs" href="room-TheSeas/index.html" style="left:82%; top:58%; width:14%; height:26%;">
-        <span class="sr-only">Enter: The Seas</span>
+      <a class="hs" href="room-TheSeas/index.html"
+         style="left:76%; top:66%; width:16%; height:26%;">
+        <span class="sr-only">The Seas</span>
       </a>
     </div>
 
     <p class="legend">
-      If a hotspot is a bit off, adjust its inline <code>left</code>, <code>top</code>, <code>width</code>, and <code>height</code> (all in %).
-      Percentages track the image’s size, so the map stays accurate on phones and desktops.
+      Need to fine-tune? Press <strong>H</strong> to toggle a dashed overlay. While overlay is on,
+      clicking anywhere logs the <em>left / top</em> percentages in the browser console so you can adjust quickly.
     </p>
   </div>
 
   <footer>© 2025 CJ Murphy</footer>
 
-  <script>
-    // Ensure the hotspots always match the image’s rendered size (handles late image load)
+<script>
+  // Dev overlay toggle + click-to-log coordinates (does not affect normal users)
+  (function () {
+    let dev = false;
+    const body = document.body;
+    const box = document.getElementById('mapBox');
     const img = document.getElementById('mapImg');
-    function ensureLoaded(ok){ if(img.complete) ok(); else img.addEventListener('load', ok, {once:true}); }
-    ensureLoaded(() => {
-      // nothing else needed; percent-based hotspots follow the image automatically
+
+    function toggleDev() {
+      dev = !dev;
+      body.classList.toggle('dev', dev);
+      console.log(dev ? 'Hotspot overlay: ON' : 'Hotspot overlay: OFF');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'h') toggleDev();
     });
-  </script>
+
+    // When dev mode is on, clicking the image logs coordinates (percentages)
+    box.addEventListener('click', (e) => {
+      if (!dev) return;
+      e.preventDefault(); // prevent navigation while tuning
+      const rect = img.getBoundingClientRect();
+      const leftPct = ((e.clientX - rect.left) / rect.width) * 100;
+      const topPct  = ((e.clientY - rect.top)  / rect.height) * 100;
+      console.log(`left:${leftPct.toFixed(1)}%; top:${topPct.toFixed(1)}%`);
+    }, true);
+  })();
+</script>
 </body>
 </html>
