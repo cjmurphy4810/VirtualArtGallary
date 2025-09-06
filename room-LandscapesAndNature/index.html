@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head>
+ <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Landscapes & Nature — Virtual Art Gallery of CJ Murphy</title>
 <style>
@@ -6,49 +6,108 @@
   --bg1:#eaf5ec; --bg2:#d8efe1; --ink:#183524; --muted:#3f6b53;
   --frame:#b88a54; --mat:#fffdf8; --matEdge:#e8e0cf; --shadow:0 18px 40px rgba(0,0,0,.22);
 }
-*{box-sizing:border-box} body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
-   radial-gradient(900px 600px at 20% 20%, rgba(80,160,120,.18), transparent 60%),
-   radial-gradient(900px 600px at 90% 80%, rgba(160,190,120,.12), transparent 60%),
-   linear-gradient(180deg,var(--bg1),var(--bg2))}
+    radial-gradient(900px 600px at 20% 20%, rgba(80,160,120,.18), transparent 60%),
+    radial-gradient(900px 600px at 90% 80%, rgba(160,190,120,.12), transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  min-height:100svh;
+}
 header{text-align:center;padding:28px 16px 6px}
 header h1{margin:0;font-size:clamp(22px,3.5vw,34px)}
 header p{margin:6px 0 0;color:var(--muted)}
-.back{display:inline-block;margin:14px auto 28px;padding:9px 16px;background:#ffffffcf;border:1px solid #d7d0c0;border-radius:10px;color:#274933;text-decoration:none}
+.back{
+  display:inline-block;margin:14px auto 28px;padding:9px 16px;background:#ffffffcf;
+  border:1px solid #d7d0c0;border-radius:10px;color:#274933;text-decoration:none
+}
 .back:hover{background:#fff}
 .shell{max-width:1200px;margin:0 auto;padding:0 18px 72px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:34px}
 .card{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
 @media(max-width:860px){.card{grid-template-columns:1fr}}
-.frame{position:relative;display:block;cursor:pointer;border:8px solid var(--frame);border-radius:18px;background:linear-gradient(180deg,#c4965f,#a67c49);
-  box-shadow:var(--shadow)}
-.frame::before{content:"";position:absolute;inset:8px;border-radius:12px;background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#fff8e9 70%);
-  box-shadow:inset 0 0 0 1px var(--matEdge), inset 0 10px 18px rgba(0,0,0,.12)}
+.frame{
+  position:relative;display:block;cursor:pointer;border:8px solid var(--frame);border-radius:18px;
+  background:linear-gradient(180deg,#c4965f,#a67c49); box-shadow:var(--shadow); overflow:hidden;
+}
+.frame::before{
+  content:"";position:absolute;inset:8px;border-radius:12px;
+  background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#fff8e9 70%);
+  box-shadow:inset 0 0 0 1px var(--matEdge), inset 0 10px 18px rgba(0,0,0,.12)
+}
 .tile{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin:10px;z-index:1}
 .tile img{width:100%;height:100%;object-fit:cover;transition:transform .25s}
 @media(hover:hover){.frame:hover .tile img{transform:scale(1.06)}}
 .meta h3{margin:2px 0 6px}.meta .sub{margin:0 0 10px;color:#45785a}.meta p{margin:0;color:#2b4e39}
 .lightbox{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,14,10,.86);z-index:60}
-.lightbox.open{display:grid}.lightbox img{max-width:min(96vw,1600px);max-height:92vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.lightbox.open{display:grid}
+.lightbox img{max-width:min(96vw,1600px);max-height:92vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
 .close{position:fixed;top:16px;right:18px;background:#254232;color:#fff;border:1px solid #6a9b7d;padding:9px 12px;border-radius:10px;z-index:61}
-</style></head><body>
+</style>
+</head><body>
 <header>
-  <h1>Landscapes & Nature</h1><p>Light oak frames and open-air hues.</p>
+  <h1>Landscapes & Nature</h1>
+  <p>Light oak frames and open-air hues.</p>
   <a class="back" href="../index.html">← Return to Lobby Map</a>
 </header>
+
 <div class="shell"><div id="cards" class="cards"></div></div>
-<div id="lb" class="lightbox"><button class="close" id="c">Close ✕</button><img id="img" alt=""></div>
+
+<div id="lb" class="lightbox" aria-modal="true" role="dialog">
+  <button class="close" id="c">Close ✕</button>
+  <img id="img" alt="">
+</div>
+
 <script>
-const FILES=["image-hotel.png","IMG_7018.PNG","IMG_0150.PNG"];
-const DESCRIPTIONS={"IMG_7018.PNG":"A trail that invites the eye to wander."};
-const ROOM="Landscapes & Nature",cards=document.getElementById('cards');const pretty=f=>f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
-for(const f of FILES){const t=pretty(f),src='img/'+encodeURIComponent(f),d=DESCRIPTIONS[f]||'Add commentary for this artwork.';
-const el=document.createElement('article');el.className='card';
-el.innerHTML=`<a href="#" class="frame" data-src="${src}" data-title="${t}"><div class="tile"><img src="${src}" alt="${t}"></div></a>
-<div class="meta"><h3>${t}</h3><p class="sub"><strong>${ROOM}</strong> · <code>${f}</code></p><p>${d}</p></div>`;
-el.querySelector('.frame').addEventListener('click',e=>{e.preventDefault();open(src,t)});cards.appendChild(el);}
-const lb=document.getElementById('lb'),im=document.getElementById('img');document.getElementById('c').onclick=close;
-lb.addEventListener('click',e=>{if(e.target===lb)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-function open(s,a){im.src=s;im.alt=a;lb.classList.add('open');document.body.style.overflow='hidden'}
-function close(){lb.classList.remove('open');im.src='';document.body.style.overflow=''}
-</script></body></html>
+/* Update: long filename replaced with 'image-hotel.png' */
+const FILES = ["image-hotel.png","IMG_7018.PNG","IMG_0150.PNG"];
+
+/* Optional plaques—add/edit freely */
+const DESCRIPTIONS = {
+  "image-hotel.png": "An urban horizon softened by nature’s palette—where structure meets sky.",
+  "IMG_7018.PNG": "A trail that invites the eye to wander."
+};
+
+const ROOM = "Landscapes & Nature";
+const cards = document.getElementById('cards');
+
+const pretty = f =>
+  f.replace(/\.[^.]+$/,'')          // drop extension
+   .replace(/[_-]+/g,' ')           // underscores/hyphens -> spaces
+   .replace(/\b\w/g, c => c.toUpperCase()) // simple title case
+   .trim();
+
+for (const f of FILES) {
+  const title = pretty(f);
+  const src   = 'img/' + encodeURIComponent(f);
+  const desc  = DESCRIPTIONS[f] || 'Add commentary for this artwork.';
+
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `
+    <a href="#" class="frame" data-src="${src}" data-title="${title}">
+      <div class="tile"><img src="${src}" alt="${title}"></div>
+    </a>
+    <div class="meta">
+      <h3>${title}</h3>
+      <p class="sub"><strong>${ROOM}</strong> · <code>${f}</code></p>
+      <p>${desc}</p>
+    </div>
+  `;
+  el.querySelector('.frame').addEventListener('click', e => { e.preventDefault(); open(src, title); });
+  cards.appendChild(el);
+}
+
+/* Lightbox */
+const lb = document.getElementById('lb');
+const im = document.getElementById('img');
+document.getElementById('c').onclick = close;
+lb.addEventListener('click', e => { if (e.target === lb) close(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+function open(src, alt){ im.src = src; im.alt = alt; lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function close(){ lb.classList.remove('open'); im.src = ''; document.body.style.overflow = ''; }
+</script>
+</body></html>
+6
