@@ -6,20 +6,14 @@
 <title>Space & Universe — Virtual Art Gallery of CJ Murphy</title>
 <style>
   :root{
-    --cosmos:#0b1020;         /* deep space */
-    --nebula1:#14213d;        /* dark blue */
-    --nebula2:#1f2e5a;        /* indigo */
-    --accent:#9ad8ff;         /* star glow */
-    --frame:#0f1219;          /* anodized black */
-    --mat:#111827;            /* very dark charcoal */
-    --mat-edge:#2a2f3a;       /* subtle bevel */
+    --cosmos:#0b1020; --nebula1:#14213d; --nebula2:#1f2e5a;
+    --frame:#0f1219; --mat:#111827; --mat-edge:#2a2f3a;
     --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
   }
 
-  /* Cosmic background (no asset required) */
+  /* Cosmic background */
   body{
-    margin:0;
-    color:#e8f2ff;
+    margin:0; color:#e8f2ff;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     background:
       radial-gradient(1200px 800px at 70% 20%, rgba(117,80,255,.15), transparent 60%),
@@ -28,11 +22,8 @@
       linear-gradient(180deg, var(--nebula1), var(--cosmos));
     min-height:100svh;
   }
-
-  /* Tiny star field */
   body::before{
-    content:"";
-    position:fixed; inset:0; pointer-events:none; opacity:.6;
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
     background:
       radial-gradient(1px 1px at 10% 15%, #fff 50%, transparent 52%),
       radial-gradient(1px 1px at 30% 40%, #fff 50%, transparent 52%),
@@ -41,7 +32,6 @@
       radial-gradient(1px 1px at 85% 35%, #fff 50%, transparent 52%),
       radial-gradient(1px 1px at 25% 80%, #fff 50%, transparent 52%),
       radial-gradient(1px 1px at 60% 85%, #fff 50%, transparent 52%);
-    background-repeat: no-repeat;
     filter: drop-shadow(0 0 4px #9ad8ff);
   }
 
@@ -52,56 +42,53 @@
   .shell{ max-width:1200px; margin:0 auto; padding:20px 16px 60px }
   .grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap:26px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* bigger tiles */
+    gap:28px;
   }
 
   /* Frame + mat */
   .frame{
-    position:relative;
+    position:relative; display:block; text-decoration:none; color:inherit; cursor:pointer;
     border:6px solid var(--frame);
     border-radius:18px;
     background:linear-gradient(180deg, #0b0d13, #161a22);
     box-shadow: var(--tile-shadow);
-    transition: transform .25s ease, box-shadow .25s ease;
+    transition: transform .22s ease, box-shadow .22s ease;
     overflow:hidden;
   }
-  .frame::before{ /* mat */
-    content:"";
-    position:absolute; inset:8px;
+  .frame::before{ /* thinner mat so art is larger */
+    content:""; position:absolute; inset:6px;
     background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0d111a 60%);
-    border-radius:12px;
-    box-shadow:
-      inset 0 0 0 1px var(--mat-edge),
-      inset 0 12px 24px rgba(0,0,0,.45);
+    border-radius:14px;
+    box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
+
   .tile{
     position:relative;
-    aspect-ratio: 3 / 2;            /* ✅ uniform thumbnail size */
-    border-radius:10px;
+    aspect-ratio: 4 / 3;           /* ✅ taller, fuller thumbnails */
+    border-radius:12px;
     overflow:hidden;
-    margin:14px;                    /* creates a mat reveal inside frame */
+    margin:8px;                    /* thinner mat reveal */
     z-index:1;
   }
   .tile img{
     width:100%; height:100%;
-    object-fit: cover;              /* crop to fit uniformly */
+    object-fit: cover;             /* fill the area; crop if needed */
     display:block;
+    transition: transform .25s ease;
   }
+
   .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
-
-  /* Hover to enlarge inside grid (desktop only) */
   @media (hover:hover){
-    .tile:hover img{ transform: scale(1.08); transition: transform .25s ease; }
+    .frame:hover .tile img{ transform: scale(1.08); } /* clearer hover peek */
   }
 
-  /* Caption */
   .caption{
     text-align:center; color:#cde6ff; font-size:.95rem;
-    padding:10px 8px 14px; letter-spacing:.2px
+    padding:8px 10px 14px; letter-spacing:.2px
   }
 
-  /* Lightbox (click to full size) */
+  /* Lightbox */
   .lightbox{
     position:fixed; inset:0; display:none; place-items:center;
     background: rgba(3,6,12,.86);
@@ -123,7 +110,7 @@
 <body>
   <header>
     <h1>Space & Universe</h1>
-    <p>Modern frames, uniform tiles. Hover to peek, click for full size.</p>
+    <p>Modern frames, uniform tiles. Hover to peek; click for full size.</p>
   </header>
 
   <div class="shell">
@@ -137,28 +124,31 @@
   </div>
 
 <script>
-  // List your image files exactly as they are in room-SpaceAndUniverse/img/
+  // List your exact filenames from room-SpaceAndUniverse/img/
   const FILES = [
     "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","IMG_0422.PNG",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
     "IMG_7024.PNG","IMG_7026.PNG"
   ];
 
-  // Build the grid
+  // Build the grid (make the whole frame clickable)
   const gallery = document.getElementById('gallery');
   for (const file of FILES) {
-    const title = file.replace(/\.[^.]+$/,''); // simple title from filename
-    const card  = document.createElement('figure');
-    card.className = 'frame';
-    card.innerHTML = `
-      <div class="tile">
-        <img src="img/${file}" alt="${title}">
-      </div>
-      <figcaption class="caption">${title}</figcaption>
+    const title = file.replace(/\.[^.]+$/,'');
+    const a = document.createElement('a');
+    a.href = "#";                 // prevent navigation; we open lightbox instead
+    a.className = 'frame';
+    a.setAttribute('data-src', `img/${file}`);
+    a.setAttribute('data-title', title);
+    a.innerHTML = `
+      <div class="tile"><img src="img/${file}" alt="${title}"></div>
+      <div class="caption">${title}</div>
     `;
-    // click to lightbox
-    card.querySelector('img').addEventListener('click', () => openLightbox(`img/${file}`, title));
-    gallery.appendChild(card);
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLightbox(a.getAttribute('data-src'), title);
+    });
+    gallery.appendChild(a);
   }
 
   // Lightbox controls
