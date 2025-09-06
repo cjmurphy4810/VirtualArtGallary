@@ -47,34 +47,28 @@
 
   <div class="wrap">
     <div class="map-box" id="mapBox">
+      <!-- ✅ Image file is in the root directory -->
       <img id="mapImg" class="map-img" src="backgroundMuseum.jpg" alt="Museum map background">
 
-      <!-- Hotspots (percent-based). Animals was already correct; others adjusted to match your screenshots. -->
-      <!-- Animals (top-left wide) -->
+      <!-- Hotspots -->
       <a class="hs" data-label="Animals" href="room-Animals/index.html"
          style="left:12.5%; top:16.0%; width:41.0%; height:18.0%;"></a>
 
-      <!-- Goth (the teal panel just right of Animals) -->
       <a class="hs" data-label="Goth" href="room-Goth/index.html"
          style="left:56.0%; top:19.0%; width:12.5%; height:17.5%;"></a>
 
-      <!-- Landscapes & Nature (green room lower-left of Animals) -->
       <a class="hs" data-label="Landscapes & Nature" href="room-LandscapesAndNature/index.html"
          style="left:16.5%; top:45.5%; width:23.0%; height:15.0%;"></a>
 
-      <!-- Life & People (tall pink room on the right column) -->
       <a class="hs" data-label="Life & People" href="room-LifeAndPeople/index.html"
          style="left:73.8%; top:17.5%; width:13.8%; height:34.5%;"></a>
 
-      <!-- Mad Men (center, beneath Landscapes & Nature, with suit + martini) -->
       <a class="hs" data-label="Mad Men" href="room-MadMen/index.html"
          style="left:49.0%; top:55.0%; width:27.5%; height:15.5%;"></a>
 
-      <!-- Space & Universe (long dark blue strip near bottom center-left) -->
       <a class="hs" data-label="Space & Universe" href="room-SpaceAndUniverse/index.html"
          style="left:35.5%; top:74.0%; width:43.0%; height:15.5%;"></a>
 
-      <!-- The Seas (tall teal room bottom-right) -->
       <a class="hs" data-label="The Seas" href="room-TheSeas/index.html"
          style="left:75.8%; top:65.0%; width:17.0%; height:26.5%;"></a>
     </div>
@@ -84,7 +78,7 @@
   <footer>© 2025 CJ Murphy</footer>
 
 <script>
-  // Tooltip on hover: "Click to enter the ‹Room› room"
+  // Tooltip logic
   (function () {
     const tip = document.getElementById('tooltip');
     const box = document.getElementById('mapBox');
@@ -110,7 +104,7 @@
       h.addEventListener('blur', hideTip);
     });
 
-    // Developer overlay toggle (press H). Not visible to visitors unless you press H.
+    // Developer overlay toggle (press H)
     let dev = false;
     document.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'h') {
