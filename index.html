@@ -1,31 +1,87 @@
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chris J. Murphy — Virtual Museum</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Virtual Art Gallery of CJ Murphy</title>
 <style>
-  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:#f7f7f7;color:#222}
-  header{padding:24px;text-align:center}
-  .container{max-width:1100px;margin:0 auto;padding:20px}
-  .rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-  .room{background:#fff;border:2px solid #222;border-radius:12px;padding:16px;text-align:center;text-decoration:none;color:inherit;box-shadow:0 6px 16px rgba(0,0,0,.06)}
-  .room:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.08)}
+  :root { --bg:#f7f6f3; --stroke:#1a1a1a; --hover: rgba(255, 215, 0, .25); }
+  * { box-sizing: border-box }
+  body { margin:0; background:var(--bg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#222; }
+  header { text-align:center; padding:28px 14px 10px; }
+  header h1 { margin:0 0 6px; font-size: clamp(22px, 3.5vw, 36px); }
+  header p { margin:0; color:#666 }
+  .wrap { max-width:1200px; margin:10px auto 40px; padding:0 12px; }
+  .map { width:100%; height:auto; display:block; border-radius:10px; box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+  a.hotspot { outline: none; }
+  rect.hs {
+    fill: transparent; stroke: var(--stroke); stroke-width: 2;
+    vector-effect: non-scaling-stroke; rx: 10; ry: 10;
+  }
+  a.hotspot:hover rect.hs, a.hotspot:focus rect.hs {
+    fill: var(--hover);
+  }
+  .legend { max-width: 1200px; margin: 10px auto 0; padding: 0 14px; color:#555; font-size:.95rem; }
+  .legend code { background:#fff; padding:2px 6px; border:1px solid #ddd; border-radius:6px }
+  footer { text-align:center; color:#777; padding:26px 10px 34px }
 </style>
 </head>
 <body>
-<header><h1>Chris J. Murphy — Virtual Museum</h1><p>Select a room</p></header>
-<main class="container">
-  <section class="rooms">
-    <a class="room" href="room-Animals/index.html">Animals</a>
-    <a class="room" href="room-Goth/index.html">Goth</a>
-    <a class="room" href="room-LandscapesAndNature/index.html">Landscapes & Nature</a>
-    <a class="room" href="room-LifeAndPeople/index.html">Life & People</a>
-    <a class="room" href="room-MadMen/index.html">Mad Men</a>
-    <a class="room" href="room-SpaceAndUniverse/index.html">Space & Universe</a>
-    <a class="room" href="room-TheSeas/index.html">The Seas</a>
-  </section>
-</main>
-<footer style="text-align:center;padding:28px;color:#666">© 2025 Chris J. Murphy</footer>
+  <header>
+    <h1>Virtual Art Gallery of CJ Murphy</h1>
+    <p>Hover any room on the map, then click to enter</p>
+  </header>
+
+  <div class="wrap">
+    <!-- Responsive SVG with background image and clickable hotspots.
+         Coordinates below are percentages so it scales cleanly. Adjust if needed. -->
+    <svg class="map" viewBox="0 0 100 100" role="img" aria-label="Museum map with clickable rooms">
+      <!-- Background image -->
+      <image href="assets/backgroundMuseum.jpg" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" />
+
+      <!-- Hotspots (approximate positions). Tweak x/y/width/height if needed. -->
+
+      <!-- Animals (top-left large) -->
+      <a class="hotspot" xlink:href="room-Animals/index.html" aria-label="Animals" tabindex="0">
+        <rect class="hs" x="6" y="14" width="36" height="16" />
+      </a>
+
+      <!-- Goth (small near top-left) -->
+      <a class="hotspot" xlink:href="room-Goth/index.html" aria-label="Goth" tabindex="0">
+        <rect class="hs" x="48" y="16" width="12" height="14" />
+      </a>
+
+      <!-- Landscapes & Nature (left-middle green room) -->
+      <a class="hotspot" xlink:href="room-LandscapesAndNature/index.html" aria-label="Landscapes and Nature" tabindex="0">
+        <rect class="hs" x="10" y="38" width="22" height="14" />
+      </a>
+
+      <!-- Life & People (right column, pink vertical room) -->
+      <a class="hotspot" xlink:href="room-LifeAndPeople/index.html" aria-label="Life and People" tabindex="0">
+        <rect class="hs" x="80" y="18" width="16" height="30" />
+      </a>
+
+      <!-- Mad Men (center) -->
+      <a class="hotspot" xlink:href="room-MadMen/index.html" aria-label="Mad Men" tabindex="0">
+        <rect class="hs" x="52" y="48" width="26" height="14" />
+      </a>
+
+      <!-- Space & Universe (bottom center, wide) -->
+      <a class="hotspot" xlink:href="room-SpaceAndUniverse/index.html" aria-label="Space and Universe" tabindex="0">
+        <rect class="hs" x="36" y="68" width="44" height="16" />
+      </a>
+
+      <!-- The Seas (bottom-right vertical) -->
+      <a class="hotspot" xlink:href="room-TheSeas/index.html" aria-label="The Seas" tabindex="0">
+        <rect class="hs" x="82" y="56" width="16" height="26" />
+      </a>
+    </svg>
+
+    <p class="legend">
+      Tip: if a hotspot is slightly off, tweak its <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> values (they’re percentages of the image).
+    </p>
+  </div>
+
+  <footer>© 2025 CJ Murphy</footer>
 </body>
 </html>
-
