@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -9,11 +9,12 @@
     --cosmos:#0b1020; --nebula1:#14213d; --nebula2:#1f2e5a;
     --frame:#0f1219; --mat:#111827; --mat-edge:#2a2f3a;
     --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
+    --ink:#e8f2ff; --muted:#bbd7ff; --subtle:#8fb6ff;
   }
 
   /* Cosmic background */
   body{
-    margin:0; color:#e8f2ff;
+    margin:0; color:var(--ink);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     background:
       radial-gradient(1200px 800px at 70% 20%, rgba(117,80,255,.15), transparent 60%),
@@ -37,16 +38,27 @@
 
   header{ text-align:center; padding:28px 16px 6px }
   header h1{ margin:0; font-size:clamp(22px,3.5vw,34px); letter-spacing:.3px }
-  header p{ margin:6px 0 0; color:#bbd7ff }
+  header p{ margin:6px 0 0; color:var(--muted) }
 
-  .shell{ max-width:1200px; margin:0 auto; padding:20px 16px 60px }
-  .grid{
+  .shell{ max-width:1200px; margin:0 auto; padding:24px 18px 72px }
+
+  /* Card grid: big items with room for plaque text */
+  .cards{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* bigger tiles */
-    gap:28px;
+    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); /* wide cards */
+    gap:34px;
+  }
+  .card{
+    display:grid;
+    grid-template-columns: 380px 1fr;      /* image left, text right */
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width: 860px){
+    .card{ grid-template-columns: 1fr; }   /* stack on small screens */
   }
 
-  /* Frame + mat */
+  /* Frame + mat (bigger art area) */
   .frame{
     position:relative; display:block; text-decoration:none; color:inherit; cursor:pointer;
     border:6px solid var(--frame);
@@ -56,36 +68,37 @@
     transition: transform .22s ease, box-shadow .22s ease;
     overflow:hidden;
   }
-  .frame::before{ /* thinner mat so art is larger */
+  .frame::before{ /* thin mat so art dominates */
     content:""; position:absolute; inset:6px;
     background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0d111a 60%);
     border-radius:14px;
     box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
-
   .tile{
     position:relative;
-    aspect-ratio: 4 / 3;           /* ✅ taller, fuller thumbnails */
-    border-radius:12px;
-    overflow:hidden;
-    margin:8px;                    /* thinner mat reveal */
-    z-index:1;
+    aspect-ratio: 4 / 3;              /* uniform thumbnails */
+    border-radius:12px; overflow:hidden;
+    margin:8px; z-index:1;
   }
   .tile img{
     width:100%; height:100%;
-    object-fit: cover;             /* fill the area; crop if needed */
-    display:block;
-    transition: transform .25s ease;
+    object-fit: cover;                 /* fills area */
+    display:block; transition: transform .25s ease;
   }
-
   .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
   @media (hover:hover){
-    .frame:hover .tile img{ transform: scale(1.08); } /* clearer hover peek */
+    .frame:hover .tile img{ transform: scale(1.08); }
   }
 
-  .caption{
-    text-align:center; color:#cde6ff; font-size:.95rem;
-    padding:8px 10px 14px; letter-spacing:.2px
+  /* Plaque / meta */
+  .meta h3{
+    margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff;
+  }
+  .meta .sub{
+    margin:0 0 12px; color:var(--subtle); font-size:.95rem;
+  }
+  .meta p{
+    margin:0; color:#d8e6ff; line-height:1.45;
   }
 
   /* Lightbox */
@@ -110,11 +123,11 @@
 <body>
   <header>
     <h1>Space & Universe</h1>
-    <p>Modern frames, uniform tiles. Hover to peek; click for full size.</p>
+    <p>Modern frames with plaques. Hover to peek; click the frame for full size.</p>
   </header>
 
   <div class="shell">
-    <div id="gallery" class="grid"></div>
+    <div id="cards" class="cards"></div>
   </div>
 
   <!-- Lightbox -->
@@ -124,34 +137,61 @@
   </div>
 
 <script>
-  // List your exact filenames from room-SpaceAndUniverse/img/
+  /* === Your images === */
   const FILES = [
     "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","IMG_0422.PNG",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
     "IMG_7024.PNG","IMG_7026.PNG"
   ];
 
-  // Build the grid (make the whole frame clickable)
-  const gallery = document.getElementById('gallery');
-  for (const file of FILES) {
-    const title = file.replace(/\.[^.]+$/,'');
-    const a = document.createElement('a');
-    a.href = "#";                 // prevent navigation; we open lightbox instead
-    a.className = 'frame';
-    a.setAttribute('data-src', `img/${file}`);
-    a.setAttribute('data-title', title);
-    a.innerHTML = `
-      <div class="tile"><img src="img/${file}" alt="${title}"></div>
-      <div class="caption">${title}</div>
-    `;
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      openLightbox(a.getAttribute('data-src'), title);
-    });
-    gallery.appendChild(a);
+  /* === Optional: edit the plaque commentary here === */
+  const DESCRIPTIONS = {
+    "IMG_0373.PNG": "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust.",
+    "IMG_0379.PNG": "A tower of gas and stardust rising like a cathedral spire inside a nebula.",
+    "IMG_0383.PNG": "Moonlit water reflecting a distant world; Earth seen through a dream.",
+    // Add/replace any entries; filename (with extension) is the key.
+    // Any file not listed here will show a short default line you can edit later.
+  };
+
+  const ROOM_NAME = "Space & Universe";
+
+  /* === Build cards: big frame + plaque === */
+  const mount = document.getElementById('cards');
+
+  function prettyTitle(file){
+    return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
   }
 
-  // Lightbox controls
+  for (const file of FILES) {
+    const title = prettyTitle(file);
+    const src   = `img/${file}`;
+    const desc  = DESCRIPTIONS[file] || "Add commentary for this artwork. Edit the DESCRIPTIONS entry in this page.";
+
+    const card  = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <a href="#" class="frame" data-src="${src}" data-title="${title}">
+        <div class="tile">
+          <img src="${src}" alt="${title}">
+        </div>
+      </a>
+      <div class="meta">
+        <h3>${title}</h3>
+        <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9c8ff">${file}</code></p>
+        <p>${desc}</p>
+      </div>
+    `;
+
+    // Make the whole frame open the lightbox
+    card.querySelector('.frame').addEventListener('click', (e) => {
+      e.preventDefault();
+      openLightbox(src, title);
+    });
+
+    mount.appendChild(card);
+  }
+
+  /* === Lightbox controls === */
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightImg');
   const closeBtn = document.getElementById('closeBtn');
