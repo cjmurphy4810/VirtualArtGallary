@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -12,7 +12,6 @@
     --ink:#e8f2ff; --muted:#bbd7ff; --subtle:#8fb6ff;
   }
 
-  /* Cosmic background */
   body{
     margin:0; color:var(--ink);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -23,6 +22,7 @@
       linear-gradient(180deg, var(--nebula1), var(--cosmos));
     min-height:100svh;
   }
+
   body::before{
     content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
     background:
@@ -40,79 +40,62 @@
   header h1{ margin:0; font-size:clamp(22px,3.5vw,34px); letter-spacing:.3px }
   header p{ margin:6px 0 0; color:var(--muted) }
 
-  .shell{ max-width:1200px; margin:0 auto; padding:24px 18px 72px }
+  .back-link{
+    display:inline-block; margin:14px auto 28px; padding:10px 18px;
+    background:#0e1320; color:#fff; text-decoration:none; border:1px solid #384054;
+    border-radius:10px; font-size:.95rem;
+    transition: background .2s ease, color .2s ease;
+  }
+  .back-link:hover{ background:#1c2340; color:#d6e4ff; }
 
-  /* Card grid: big items with room for plaque text */
+  .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
+
   .cards{
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); /* wide cards */
+    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
     gap:34px;
   }
   .card{
     display:grid;
-    grid-template-columns: 380px 1fr;      /* image left, text right */
+    grid-template-columns: 380px 1fr;
     gap:22px;
     align-items:start;
   }
   @media (max-width: 860px){
-    .card{ grid-template-columns: 1fr; }   /* stack on small screens */
+    .card{ grid-template-columns: 1fr; }
   }
 
-  /* Frame + mat (bigger art area) */
   .frame{
-    position:relative; display:block; text-decoration:none; color:inherit; cursor:pointer;
-    border:6px solid var(--frame);
-    border-radius:18px;
+    position:relative; display:block; cursor:pointer;
+    border:6px solid var(--frame); border-radius:18px;
     background:linear-gradient(180deg, #0b0d13, #161a22);
     box-shadow: var(--tile-shadow);
     transition: transform .22s ease, box-shadow .22s ease;
     overflow:hidden;
   }
-  .frame::before{ /* thin mat so art dominates */
+  .frame::before{
     content:""; position:absolute; inset:6px;
     background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0d111a 60%);
     border-radius:14px;
     box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
-  .tile{
-    position:relative;
-    aspect-ratio: 4 / 3;              /* uniform thumbnails */
-    border-radius:12px; overflow:hidden;
-    margin:8px; z-index:1;
-  }
-  .tile img{
-    width:100%; height:100%;
-    object-fit: cover;                 /* fills area */
-    display:block; transition: transform .25s ease;
-  }
+  .tile{ position:relative; aspect-ratio: 4 / 3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
+  .tile img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
   .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
   @media (hover:hover){
     .frame:hover .tile img{ transform: scale(1.08); }
   }
 
-  /* Plaque / meta */
-  .meta h3{
-    margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff;
-  }
-  .meta .sub{
-    margin:0 0 12px; color:var(--subtle); font-size:.95rem;
-  }
-  .meta p{
-    margin:0; color:#d8e6ff; line-height:1.45;
-  }
+  .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
+  .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
+  .meta p{ margin:0; color:#d8e6ff; line-height:1.45; }
 
-  /* Lightbox */
   .lightbox{
     position:fixed; inset:0; display:none; place-items:center;
-    background: rgba(3,6,12,.86);
-    z-index:60;
+    background: rgba(3,6,12,.86); z-index:60;
   }
   .lightbox.open{ display:grid; }
-  .lightbox img{
-    max-width: min(96vw, 1600px);
-    max-height: 92vh;
-    border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6)
-  }
+  .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
   .closeBtn{
     position:fixed; top:16px; right:18px; z-index:61;
     background:#0e1320; color:#fff; border:1px solid #384054;
@@ -124,6 +107,8 @@
   <header>
     <h1>Space & Universe</h1>
     <p>Modern frames with plaques. Hover to peek; click the frame for full size.</p>
+    <!-- ✅ Back to lobby link -->
+    <a href="../index.html" class="back-link">← Return to Lobby Map</a>
   </header>
 
   <div class="shell">
@@ -137,30 +122,22 @@
   </div>
 
 <script>
-  /* === Your images === */
   const FILES = [
     "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","IMG_0422.PNG",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
     "IMG_7024.PNG","IMG_7026.PNG"
   ];
 
-  /* === Optional: edit the plaque commentary here === */
   const DESCRIPTIONS = {
     "IMG_0373.PNG": "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust.",
     "IMG_0379.PNG": "A tower of gas and stardust rising like a cathedral spire inside a nebula.",
-    "IMG_0383.PNG": "Moonlit water reflecting a distant world; Earth seen through a dream.",
-    // Add/replace any entries; filename (with extension) is the key.
-    // Any file not listed here will show a short default line you can edit later.
+    "IMG_0383.PNG": "Moonlit water reflecting a distant world; Earth seen through a dream."
   };
 
   const ROOM_NAME = "Space & Universe";
-
-  /* === Build cards: big frame + plaque === */
   const mount = document.getElementById('cards');
 
-  function prettyTitle(file){
-    return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
-  }
+  function prettyTitle(file){ return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim(); }
 
   for (const file of FILES) {
     const title = prettyTitle(file);
@@ -171,9 +148,7 @@
     card.className = 'card';
     card.innerHTML = `
       <a href="#" class="frame" data-src="${src}" data-title="${title}">
-        <div class="tile">
-          <img src="${src}" alt="${title}">
-        </div>
+        <div class="tile"><img src="${src}" alt="${title}"></div>
       </a>
       <div class="meta">
         <h3>${title}</h3>
@@ -181,30 +156,23 @@
         <p>${desc}</p>
       </div>
     `;
-
-    // Make the whole frame open the lightbox
     card.querySelector('.frame').addEventListener('click', (e) => {
-      e.preventDefault();
-      openLightbox(src, title);
+      e.preventDefault(); openLightbox(src, title);
     });
-
     mount.appendChild(card);
   }
 
-  /* === Lightbox controls === */
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightImg');
   const closeBtn = document.getElementById('closeBtn');
 
   function openLightbox(src, alt){
-    lbImg.src = src;
-    lbImg.alt = alt;
+    lbImg.src = src; lbImg.alt = alt;
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
   function closeLightbox(){
-    lb.classList.remove('open');
-    lbImg.src = '';
+    lb.classList.remove('open'); lbImg.src = '';
     document.body.style.overflow = '';
   }
   lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
