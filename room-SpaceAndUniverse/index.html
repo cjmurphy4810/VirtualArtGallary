@@ -1,5 +1,4 @@
-
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -15,7 +14,7 @@
 
   body{
     margin:0; color:var(--ink);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     background:
       radial-gradient(1200px 800px at 70% 20%, rgba(117,80,255,.15), transparent 60%),
       radial-gradient(1000px 700px at 20% 70%, rgba(0,180,255,.12), transparent 65%),
@@ -23,7 +22,6 @@
       linear-gradient(180deg, var(--nebula1), var(--cosmos));
     min-height:100svh;
   }
-
   body::before{
     content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
     background:
@@ -108,7 +106,6 @@
   <header>
     <h1>Space & Universe</h1>
     <p>Modern frames with plaques. Hover to peek; click the frame for full size.</p>
-    <!-- ✅ Back to lobby link -->
     <a href="../index.html" class="back-link">← Return to Lobby Map</a>
   </header>
 
@@ -123,6 +120,7 @@
   </div>
 
 <script>
+  // Filenames must match EXACT case used in your repo.
   const FILES = [
     "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","Illumination Vista.png",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
@@ -139,32 +137,52 @@
   const ROOM_NAME = "Space & Universe";
   const mount = document.getElementById('cards');
 
-  function prettyTitle(file){ return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim(); }
+  function prettyTitle(file){
+    return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+  }
 
+  // Build the grid
   for (const file of FILES) {
     const title = prettyTitle(file);
-    const src   = `img/${file}`;
-    const desc  = DESCRIPTIONS[file] || "Add commentary for this artwork. Edit the DESCRIPTIONS entry in this page.";
+    // Encode the filename to safely handle spaces and special chars
+    const src = `img/${encodeURIComponent(file)}`;
+    const desc = DESCRIPTIONS[file] || "Add commentary for this artwork. Edit the DESCRIPTIONS entry in this page.";
 
-    const card  = document.createElement('article');
+    const card = document.createElement('article');
     card.className = 'card';
     card.innerHTML = `
       <a href="#" class="frame" data-src="${src}" data-title="${title}">
-        <div class="tile"><img src="${src}" alt="${title}"></div>
+        <div class="tile">
+          <img src="${src}" alt="${title}" decoding="async" loading="lazy">
+        </div>
       </a>
       <div class="meta">
         <h3>${title}</h3>
-        <p class="sub"><strong>${ROOM_NAME}</strong
         <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9c8ff">${file}</code></p>
         <p>${desc}</p>
       </div>
     `;
+
+    // Click to open lightbox
     card.querySelector('.frame').addEventListener('click', (e) => {
-      e.preventDefault(); openLightbox(src, title);
+      e.preventDefault();
+      openLightbox(src, title);
     });
+
+    // Helpful: show a visual hint if the path is wrong
+    const imgEl = card.querySelector('img');
+    imgEl.addEventListener('error', () => {
+      imgEl.alt = `Missing: ${file}`;
+      imgEl.style.objectFit = 'contain';
+      imgEl.style.background = '#2a2f3a';
+      imgEl.style.border = '2px dashed #ff8a8a';
+      console.warn('Image not found:', src);
+    });
+
     mount.appendChild(card);
   }
 
+  // Lightbox controls
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightImg');
   const closeBtn = document.getElementById('closeBtn');
