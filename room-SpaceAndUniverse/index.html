@@ -70,7 +70,7 @@
 
 <script>
   const FILES = [
-    "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","Illumination Vista.png",
+    "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","Illumination_Vista.png",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
     "IMG_7024.PNG","IMG_7026.PNG"
   ];
@@ -79,7 +79,7 @@
     "IMG_0373.PNG": "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust.",
     "IMG_0379.PNG": "A tower of gas and stardust rising like a cathedral spire inside a nebula.",
     "IMG_0383.PNG": "Moonlit water reflecting a distant world; Earth seen through a dream.",
-    "Illumination Vista.png": "A vista of northern lights and lighted waters in a world of nature and beauty."
+    "Illumination_Vista.png": "A vista of northern lights and lighted waters in a world of nature and beauty."
   };
 
   const ROOM_NAME = "Space & Universe";
@@ -93,7 +93,7 @@
     const title = prettyTitle(file);
 
     // special handling only for the file with space in its name
-    const src = file === "Illumination Vista.png"
+    const src = file === "Illumination_Vista.png"
       ? "img/" + encodeURIComponent(file)
       : "img/" + file;
 
