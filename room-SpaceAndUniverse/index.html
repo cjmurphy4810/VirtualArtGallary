@@ -11,10 +11,10 @@
     --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
     --ink:#e8f2ff; --muted:#bbd7ff; --subtle:#8fb6ff;
   }
-  *{box-sizing:border-box}
+
   body{
     margin:0; color:var(--ink);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     background:
       radial-gradient(1200px 800px at 70% 20%, rgba(117,80,255,.15), transparent 60%),
       radial-gradient(1000px 700px at 20% 70%, rgba(0,180,255,.12), transparent 65%),
@@ -22,6 +22,7 @@
       linear-gradient(180deg, var(--nebula1), var(--cosmos));
     min-height:100svh;
   }
+
   body::before{
     content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
     background:
@@ -38,6 +39,7 @@
   header{ text-align:center; padding:28px 16px 6px }
   header h1{ margin:0; font-size:clamp(22px,3.5vw,34px); letter-spacing:.3px }
   header p{ margin:6px 0 0; color:var(--muted) }
+
   .back-link{
     display:inline-block; margin:14px auto 28px; padding:10px 18px;
     background:#0e1320; color:#fff; text-decoration:none; border:1px solid #384054;
@@ -47,6 +49,7 @@
   .back-link:hover{ background:#1c2340; color:#d6e4ff; }
 
   .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
+
   .cards{
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
@@ -58,7 +61,9 @@
     gap:22px;
     align-items:start;
   }
-  @media (max-width: 860px){ .card{ grid-template-columns: 1fr; } }
+  @media (max-width: 860px){
+    .card{ grid-template-columns: 1fr; }
+  }
 
   .frame{
     position:relative; display:block; cursor:pointer;
@@ -77,7 +82,9 @@
   .tile{ position:relative; aspect-ratio: 4 / 3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
   .tile img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
   .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
-  @media (hover:hover){ .frame:hover .tile img{ transform: scale(1.08); } }
+  @media (hover:hover){
+    .frame:hover .tile img{ transform: scale(1.08); }
+  }
 
   .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
   .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
@@ -95,7 +102,7 @@
     padding:10px 14px; border-radius:10px; cursor:pointer;
   }
 
-  /* subtle inline warning style shown only if all sources fail */
+  /* only shown if the problem image still cannot be found */
   .missing{
     position:absolute; inset:8px; display:grid; place-items:center;
     border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a;
@@ -121,92 +128,97 @@
   </div>
 
 <script>
-  // Artwork list. Each item can include alias filenames tried on error.
-  const ARTWORKS = [
-    { file: "IMG_0373.PNG",
-      desc: "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust." },
-    { file: "IMG_0379.PNG",
-      desc: "A tower of gas and stardust rising like a cathedral spire inside a nebula." },
-    { file: "IMG_0383.PNG",
-      desc: "Moonlit water reflecting a distant world; Earth seen through a dream." },
-
-    // The problem file with resilient aliases:
-    { file: "Illumination Vista.png",
-      aliases: [
-        "illumination-vista.png",     // hyphenated
-        "Illumination  Vista.png",    // double ASCII space
-        "Illumination\u00A0Vista.png",// NBSP between words
-        "Illumination Vista .png"     // stray space before extension
-      ],
-      desc: "A vista of northern lights and lighted waters in a world of nature and beauty." },
-
-    { file: "IMG_0425.PNG" },
-    { file: "IMG_7021.PNG" },
-    { file: "IMG_7022.PNG" },
-    { file: "IMG_7023.PNG" },
-    { file: "IMG_7024.PNG" },
-    { file: "IMG_7026.PNG" }
+  // Keep EXACT filenames (case-sensitive) shown in your screenshot.
+  const FILES = [
+    "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","Illumination Vista.png",
+    "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
+    "IMG_7024.PNG","IMG_7026.PNG"
   ];
+
+  const DESCRIPTIONS = {
+    "IMG_0373.PNG": "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust.",
+    "IMG_0379.PNG": "A tower of gas and stardust rising like a cathedral spire inside a nebula.",
+    "IMG_0383.PNG": "Moonlit water reflecting a distant world; Earth seen through a dream.",
+    "Illumination Vista.png": "A vista of northern lights and lighted waters in a world of nature and beauty."
+  };
 
   const ROOM_NAME = "Space & Universe";
   const mount = document.getElementById('cards');
 
-  const urlFor = f => `img/${encodeURIComponent(f)}`;
-  const titleFrom = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+  function prettyTitle(file){
+    return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+  }
 
-  function buildCard(entry){
-    const title = titleFrom(entry.file);
-    const srcs = [entry.file, ...(entry.aliases || [])].map(urlFor);
+  // Fallback candidates ONLY for the one problem file you replaced.
+  // (Covers NBSP, double-space, stray-space-before-extension, lowercased name.)
+  const ILLUM_CANDIDATES = [
+    "img/Illumination Vista.png",          // normal space (browser will encode to %20)
+    "img/Illumination%20Vista.png",        // explicit %20
+    "img/Illumination\u00A0Vista.png",     // NBSP between words
+    "img/Illumination%20%20Vista.png",     // double ASCII space
+    "img/Illumination%20Vista%20.png",     // space before extension
+    "img/illumination%20vista.png"         // fully lowercased name
+  ];
 
-    const card = document.createElement('article');
+  function mountCard(file){
+    const title = prettyTitle(file);
+    const card  = document.createElement('article');
     card.className = 'card';
+
+    const srcDefault = `img/${file}`; // leave others exactly as before
+
     card.innerHTML = `
       <a href="#" class="frame">
         <div class="tile">
           <img alt="${title}" decoding="async" loading="lazy">
-          <div class="missing" hidden>Missing: <br><code>${entry.file}</code></div>
+          <div class="missing" hidden>Missing:<br><code>${file}</code></div>
         </div>
       </a>
       <div class="meta">
         <h3>${title}</h3>
-        <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9c8ff">${entry.file}</code></p>
-        <p>${entry.desc || "Add commentary for this artwork. Edit the ARTWORKS list in this page."}</p>
+        <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9c8ff">${file}</code></p>
+        <p>${DESCRIPTIONS[file] || "Add commentary for this artwork. Edit the DESCRIPTIONS entry in this page."}</p>
       </div>
     `;
 
-    const link = card.querySelector('.frame');
-    const img  = card.querySelector('img');
-    const miss = card.querySelector('.missing');
+    const frame = card.querySelector('.frame');
+    const img   = card.querySelector('img');
+    const miss  = card.querySelector('.missing');
 
-    // Try each candidate src until one loads
-    let i = 0;
-    function tryNext(){
-      if (i >= srcs.length){
-        miss.hidden = false;
-        img.style.objectFit = 'contain';
-        img.style.background = '#2a2f3a';
-        return;
+    // Only the replaced file gets fallback handling.
+    if (file === "Illumination Vista.png"){
+      const candidates = ILLUM_CANDIDATES.slice(); // copy
+      let i = 0;
+      function tryNext(){
+        if (i >= candidates.length){
+          miss.hidden = false;
+          img.style.objectFit = 'contain';
+          img.style.background = '#2a2f3a';
+          return;
+        }
+        img.src = candidates[i++];
       }
-      img.src = srcs[i++];
+      img.addEventListener('error', tryNext);
+      img.addEventListener('load', () => { miss.hidden = true; });
+      tryNext(); // start trying
+    } else {
+      // Everyone else uses the original simple src that was already working
+      img.src = srcDefault;
     }
-    img.addEventListener('error', tryNext, { once:false });
-    img.addEventListener('load', () => { miss.hidden = true; }, { once:false });
-    tryNext();
 
-    // Lightbox open using the successfully loaded src
-    link.addEventListener('click', (e) => {
+    // Lightbox opens whatever successfully loaded src is on the tag
+    frame.addEventListener('click', (e) => {
       e.preventDefault();
-      if (!img.src) return;
-      openLightbox(img.src, img.alt);
+      if (img.complete && img.naturalWidth) openLightbox(img.src, title);
     });
 
-    return card;
+    mount.appendChild(card);
   }
 
-  // Render
-  ARTWORKS.forEach(a => mount.appendChild(buildCard(a)));
+  // Render all cards
+  for (const f of FILES) mountCard(f);
 
-  // Lightbox
+  // Lightbox controls
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightImg');
   const closeBtn = document.getElementById('closeBtn');
