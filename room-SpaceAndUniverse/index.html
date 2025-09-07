@@ -92,10 +92,7 @@
   for (const file of FILES) {
     const title = prettyTitle(file);
 
-    // special handling only for the file with space in its name
-    const src = file === "Illumination_Vista.png"
-      ? "img/" + encodeURIComponent(file)
-      : "img/" + file;
+     
 
     const desc = DESCRIPTIONS[file] || "Add commentary for this artwork.";
 
