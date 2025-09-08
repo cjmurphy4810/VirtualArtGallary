@@ -24,7 +24,6 @@
   header{ text-align:center; padding:28px 16px 10px }
   header h1{ margin:0; font-size:clamp(22px,3.5vw,34px) }
   header p{ margin:6px 0 0; color:var(--muted) }
-
   .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 26px }
   .btn,.linkbtn{
     background:#111923; color:#e8fff5; border:1px solid #3a4856;
@@ -97,7 +96,7 @@
   </dialog>
 
 <script>
-/* 1) EXACT filenames (with spaces) — no URL encoding will be applied. */
+/* Exact filenames (with spaces) */
 const FILES = [
   "Screen Shot 2025-09-08 at 8.57.00 AM.png",
   "Screen Shot 2025-09-08 at 8.57.30 AM.png",
@@ -115,10 +114,10 @@ const FILES = [
   "Screen Shot 2025-09-08 at 9.08.34 AM.png"
 ];
 
-/* 2) Plain relative base — the images live in ./img/ next to this file. */
-const BASE = "img/";
+/* Absolute base that matches your confirmed working URL */
+const ABS_BASE = "https://cjmurphy4810.github.io/VirtualArtGallary/room-Animals/img/";
 
-/* 3) Optional captions.json overrides (title/desc). */
+/* Captions override (optional) */
 async function loadCaptions(){
   try{
     const r = await fetch('captions.json', {cache:'no-store'});
@@ -137,8 +136,7 @@ const closeBtn = document.getElementById('closeBtn');
 const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
 
 function buildCard(file, caption){
-  // IMPORTANT: use the literal filename with spaces inside quotes.
-  const src   = BASE + file;
+  const src   = ABS_BASE + encodeURIComponent(file);
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Write a short artist statement or description here (override via captions.json).";
 
@@ -147,9 +145,9 @@ function buildCard(file, caption){
   card.innerHTML = `
     <a href="#" class="frame">
       <div class="tile">
-        <img src="${src}" alt="${title}" decoding="async" loading="lazy">
+        <img alt="${title}" decoding="async" loading="lazy">
         <div class="missing" hidden>
-          Missing:<br><small><code>${src}</code></small>
+          Missing:<br><small><a href="${src}" target="_blank" rel="noopener">${src}</a></small>
         </div>
       </div>
     </a>
@@ -164,23 +162,35 @@ function buildCard(file, caption){
   const miss = card.querySelector('.missing');
   const link = card.querySelector('.frame');
 
-  img.addEventListener('error', ()=>{ miss.hidden = false; img.style.objectFit='contain'; img.style.background='#2a2f3a'; });
-  img.addEventListener('load',  ()=>{ miss.hidden = true; });
+  img.addEventListener('error', () => {
+    miss.hidden = false;
+    img.style.objectFit = 'contain';
+    img.style.background = '#2a2f3a';
+  });
+  img.addEventListener('load', () => { miss.hidden = true; });
+  img.src = src;
 
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    if (img.currentSrc) openLightbox(img.currentSrc, img.alt);
+    if (img.src) openLightbox(img.src, img.alt);
   });
 
   return card;
 }
 
-function openLightbox(src, alt){ lbImg.src = src; lbImg.alt = alt; lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
-function closeLightbox(){ lb.classList.remove('open'); lbImg.src = ''; document.body.style.overflow = ''; }
-lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+function openLightbox(src, alt){
+  lbImg.src = src; lbImg.alt = alt;
+  lb.classList.add('open'); document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  lb.classList.remove('open'); lbImg.src = '';
+  document.body.style.overflow = '';
+}
+lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
 
+/* Render */
 (async function init(){
   const captions = await loadCaptions();
   cardsEl.innerHTML = '';
