@@ -1,120 +1,6 @@
- <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Animals — Virtual Art Gallery of CJ Murphy</title>
-<style>
-  :root{
-    --bg1:#0f1720; --bg2:#0b141a;
-    --accentGlow: rgba(72,200,140,.14);
-    --frame:#1a1f26; --mat:#141a20; --mat-edge:#2b313a;
-    --ink:#eef6f3; --muted:#bfe4d3; --subtle:#9ed5c0;
-    --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; color:var(--ink);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    background:
-      radial-gradient(900px 600px at 80% 15%, var(--accentGlow), transparent 60%),
-      radial-gradient(1000px 700px at 20% 80%, var(--accentGlow), transparent 65%),
-      linear-gradient(180deg, var(--bg1), var(--bg2));
-    min-height:100svh;
-  }
-  header{ text-align:center; padding:28px 16px 10px }
-  header h1{ margin:0; font-size:clamp(22px,3.5vw,34px) }
-  header p{ margin:6px 0 0; color:var(--muted) }
-  .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 26px }
-  .btn,.linkbtn{
-    background:#111923; color:#e8fff5; border:1px solid #3a4856;
-    padding:10px 14px; border-radius:10px; font-size:.95rem; cursor:pointer; text-decoration:none;
-  }
-  .btn:hover,.linkbtn:hover{ background:#1a2330; }
-  .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
-  .cards{
-    display:grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap:34px;
-  }
-  .card{
-    display:grid; grid-template-columns: 380px 1fr; gap:22px; align-items:start;
-  }
-  @media (max-width: 860px){ .card{ grid-template-columns: 1fr; } }
-  .frame{
-    position:relative; display:block; cursor:pointer;
-    border:6px solid var(--frame); border-radius:18px;
-    background:linear-gradient(180deg, #0e141a, #151d24);
-    box-shadow: var(--tile-shadow); transition: transform .22s ease, box-shadow .22s ease; overflow:hidden;
-  }
-  .frame::before{
-    content:""; position:absolute; inset:6px; border-radius:14px;
-    background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0e151c 60%);
-    box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
-  }
-  .tile{ position:relative; aspect-ratio:4/3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
-  .tile img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
-  .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
-  @media (hover:hover){ .frame:hover .tile img{ transform: scale(1.08); } }
-  .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
-  .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
-  .meta p{ margin:0; color:#e5fff7; line-height:1.45; }
-  .lightbox{ position:fixed; inset:0; display:none; place-items:center; background: rgba(3,6,12,.86); z-index:60; }
-  .lightbox.open{ display:grid; }
-  .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
-  .closeBtn{ position:fixed; top:16px; right:18px; z-index:61; background:#111923; color:#fff; border:1px solid #3a4856; padding:10px 14px; border-radius:10px; cursor:pointer; }
-  .missing{ position:absolute; inset:8px; display:grid; place-items:center; border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a; border-radius:12px; font-size:.9rem; text-align:center; padding:8px; }
-  dialog{ border:1px solid #2e3a46; border-radius:12px; padding:16px; background:#0f1720; color:#eafff7; width:min(920px,96vw) }
-  dialog::backdrop{ background:rgba(0,0,0,.55) }
-  textarea{ width:100%; min-height:240px; background:#0b141a; color:#eafff7; border:1px solid #2e3a46; border-radius:8px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.95rem }
-</style>
-</head>
-<body>
-  <header>
-    <h1>Animals</h1>
-    <p>Modern frames with plaques. Hover to peek; click a frame for full size.</p>
-    <div class="actions">
-      <a href="../index.html" class="linkbtn">← Return to Lobby Map</a>
-      <button class="btn" id="btnPaste">Paste Filenames</button>
-      <button class="btn" id="btnFilesDownload">Download files.json</button>
-      <button class="btn" id="btnCapTemplate">Captions Template</button>
-      <button class="btn" id="btnCapDownload">Download captions.json</button>
-    </div>
-  </header>
-
-  <div class="shell">
-    <div id="cards" class="cards" aria-live="polite"></div>
-  </div>
-
-  <!-- Lightbox -->
-  <div id="lightbox" class="lightbox" aria-modal="true" role="dialog">
-    <button class="closeBtn" id="closeBtn" aria-label="Close">Close ✕</button>
-    <img id="lightImg" alt="">
-  </div>
-
-  <!-- Dialog for pasting filenames -->
-  <dialog id="dlgFiles">
-    <h3 style="margin:0 0 10px">Paste filenames (one per line as shown in Finder)</h3>
-    <textarea id="filesBox"></textarea>
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
-      <button class="btn" id="filesApply">Apply</button>
-      <button class="btn" id="filesClose">Close</button>
-    </div>
-  </dialog>
-
-  <!-- Dialog for captions template -->
-  <dialog id="dlgCap">
-    <h3 style="margin:0 0 10px">captions.json template (edit, then download & upload beside this page)</h3>
-    <p style="margin:0 0 10px; color:#bfe4d3">Keys are exact filenames (case-sensitive) in <code>img/</code>. You may change <em>title</em> and <em>desc</em>.</p>
-    <textarea id="capText"></textarea>
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
-      <button class="btn" id="capClose">Close</button>
-    </div>
-  </dialog>
-
-<script>
-/* ============================================================
-   CONFIG — initial list based on your screenshot (exact names)
-   You can keep this, or paste/overwrite using the UI button.
-   ============================================================ */
+ <script>
+/* ====== CONFIG ====== */
+/* Keep your existing FILES_FALLBACK list here. */
 const FILES_FALLBACK = [
   "Screen Shot 2025-09-08 at 8.57.00 AM.png",
   "Screen Shot 2025-09-08 at 8.57.30 AM.png",
@@ -132,7 +18,24 @@ const FILES_FALLBACK = [
   "Screen Shot 2025-09-08 at 9.08.34 AM.png"
 ];
 
-/* --- auto-loaders (optional files that override the fallback) --- */
+/* Try these base folders in order. The first one should be correct
+   for a page at room-Animals/index.html with images at room-Animals/img/.
+   The others are just safety nets while you move files. */
+const BASES = [
+  new URL('img/', location.href).href,                 // ./img/
+  new URL('../room-Animals/img/', location.href).href, // ../room-Animals/img/
+  new URL('../img/', location.href).href               // ../img/
+];
+
+const ROOM_NAME = "Animals";
+const cardsEl = document.getElementById('cards');
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightImg');
+const closeBtn = document.getElementById('closeBtn');
+
+const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+const enc = s => encodeURIComponent(s).replace(/%2F/gi,'/'); // keep any slashes if present
+
 async function loadFiles(){
   try{
     const r = await fetch('files.json', {cache:'no-store'});
@@ -151,45 +54,53 @@ async function loadCaptions(){
   }catch{ return {}; }
 }
 
-/* --- rendering helpers --- */
-const ROOM_NAME = "Animals";
-const cardsEl = document.getElementById('cards');
-const lb = document.getElementById('lightbox');
-const lbImg = document.getElementById('lightImg');
-const closeBtn = document.getElementById('closeBtn');
-const urlFor = f => `img/${encodeURIComponent(f)}`;
-const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
-
 function buildCard(file, caption){
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Add a description for this artwork in captions.json.";
+
+  // Generate candidate URLs across all base paths
+  const candidates = BASES.map(b => b + enc(file));
+
   const card = document.createElement('article');
   card.className = 'card';
   card.innerHTML = `
     <a href="#" class="frame">
       <div class="tile">
         <img alt="${title}" decoding="async" loading="lazy">
-        <div class="missing" hidden>Missing: <br><code>${file}</code></div>
+        <div class="missing" hidden>Missing:<br><code>${file}</code><br>
+          <small><a class="trylink" href="#" target="_blank" rel="noopener">open attempted URL</a></small>
+        </div>
       </div>
     </a>
     <div class="meta">
       <h3>${title}</h3>
-      <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9d7c3">${file}</code></p>
+      <p class="sub"><strong>${ROOM_NAME}</strong> ·
+        <code style="font-size:.9rem;color:#a9d7c3">${file}</code></p>
       <p>${desc}</p>
     </div>
   `;
   const img  = card.querySelector('img');
   const miss = card.querySelector('.missing');
   const link = card.querySelector('.frame');
+  const trylink = card.querySelector('.trylink');
 
-  img.addEventListener('error', () => {
-    miss.hidden = false;
-    img.style.objectFit = 'contain';
-    img.style.background = '#2a2f3a';
-  });
+  let i = 0;
+  function tryNext(){
+    if (i >= candidates.length){
+      miss.hidden = false;
+      trylink.href = candidates[candidates.length - 1]; // show last tried
+      img.style.objectFit = 'contain';
+      img.style.background = '#2a2f3a';
+      return;
+    }
+    const src = candidates[i++];
+    trylink.href = src;
+    img.src = src;
+  }
+  img.addEventListener('error', tryNext);
   img.addEventListener('load', () => { miss.hidden = true; });
+  tryNext();
 
-  img.src = urlFor(file);
   link.addEventListener('click', (e) => {
     e.preventDefault();
     if (img.src) openLightbox(img.src, img.alt);
@@ -209,71 +120,11 @@ lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
 
-/* --- initial render --- */
-let currentFiles = [];
-let currentCaptions = {};
+let currentFiles = [], currentCaptions = {};
 (async function init(){
   currentFiles = await loadFiles();
   currentCaptions = await loadCaptions();
-  render();
-})();
-function render(){
   cardsEl.innerHTML = '';
   currentFiles.forEach(f => cardsEl.appendChild(buildCard(f, currentCaptions[f])));
-}
-
-/* =========================
-   UI: paste filenames / save
-   ========================= */
-const dlgFiles = document.getElementById('dlgFiles');
-const filesBox = document.getElementById('filesBox');
-document.getElementById('btnPaste').addEventListener('click', ()=>{
-  filesBox.value = currentFiles.join('\n');
-  dlgFiles.showModal();
-});
-document.getElementById('filesClose').addEventListener('click', ()=> dlgFiles.close());
-document.getElementById('filesApply').addEventListener('click', ()=>{
-  const lines = filesBox.value.split('\n')
-    .map(s=>s.trim()).filter(Boolean);
-  if(lines.length){
-    currentFiles = lines;
-    render();
-  }
-  dlgFiles.close();
-});
-document.getElementById('btnFilesDownload').addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify(currentFiles, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = Object.assign(document.createElement('a'), {href:url, download:'files.json'});
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
-
-/* =========================
-   UI: captions template/save
-   ========================= */
-const dlgCap = document.getElementById('dlgCap');
-const capText = document.getElementById('capText');
-document.getElementById('btnCapTemplate').addEventListener('click', ()=>{
-  const obj = {};
-  currentFiles.forEach(f=>{
-    obj[f] = currentCaptions[f] || {
-      title: prettyTitle(f),
-      desc: "Write a short artist statement or description here."
-    };
-  });
-  capText.value = JSON.stringify(obj, null, 2);
-  dlgCap.showModal();
-});
-document.getElementById('capClose').addEventListener('click', ()=> dlgCap.close());
-document.getElementById('btnCapDownload').addEventListener('click', ()=>{
-  const text = capText.value && capText.value.trim()
-    ? capText.value
-    : JSON.stringify(Object.fromEntries(currentFiles.map(f=>[f,{title:prettyTitle(f),desc:"Write a short artist statement or description here."} ])), null, 2);
-  const blob = new Blob([text], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
+})();
 </script>
-</body>
-</html>
