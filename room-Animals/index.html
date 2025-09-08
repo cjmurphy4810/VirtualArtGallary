@@ -1,104 +1,315 @@
- <!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Animals — Virtual Art Gallery of CJ Murphy</title>
 <style>
-:root{
-  --bg1:#f6efe4; --bg2:#efe3cf; --ink:#2b1d12; --muted:#6a513f;
-  --frame:#6b4c2a; --frameEdge:#8a6137; --mat:#fffaf2; --matEdge:#e9dcc7;
-  --shadow:0 18px 40px rgba(0,0,0,.25);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:
-   radial-gradient(900px 600px at 80% 10%, rgba(170,120,60,.15), transparent 60%),
-   radial-gradient(900px 600px at 10% 90%, rgba(120,190,120,.12), transparent 60%),
-   linear-gradient(180deg,var(--bg1),var(--bg2));
-  min-height:100svh
-}
-header{text-align:center;padding:28px 16px 6px}
-header h1{margin:0;font-size:clamp(22px,3.5vw,34px)}
-header p{margin:6px 0 0;color:var(--muted)}
-.back{display:inline-block;margin:14px auto 28px;padding:9px 16px;background:#fff;border:1px solid #d7c7ad;border-radius:10px;color:#5a452f;text-decoration:none}
-.back:hover{background:#fbf6ee}
-.shell{max-width:1200px;margin:0 auto;padding:0 18px 72px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:34px}
-.card{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
-@media(max-width:860px){.card{grid-template-columns:1fr}}
+  :root{
+    /* Warm, natural palette for Animals room */
+    --bg1:#0f1720; --bg2:#0b141a;
+    --accent1:#245a3d; --accent2:#2e7a52; --accentGlow: rgba(72,200,140,.14);
+    --frame:#1a1f26; --mat:#141a20; --mat-edge:#2b313a;
+    --ink:#eef6f3; --muted:#bfe4d3; --subtle:#9ed5c0;
+    --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
 
-.frame{
-  position:relative;display:block;cursor:pointer;border:8px solid var(--frame);border-radius:18px;
-  background:linear-gradient(180deg,#6f4e2d,#5c3f23);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s
-}
-.frame::before{
-  content:"";position:absolute;inset:8px;border-radius:12px;
-  background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#fff3e1 70%);
-  box-shadow:inset 0 0 0 1px var(--matEdge), inset 0 10px 18px rgba(0,0,0,.15)
-}
+  body{
+    margin:0; color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(900px 600px at 80% 15%, var(--accentGlow), transparent 60%),
+      radial-gradient(1000px 700px at 20% 80%, var(--accentGlow), transparent 65%),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
+    min-height:100svh;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
+    background:
+      radial-gradient(1px 1px at 15% 20%, #fff 50%, transparent 52%),
+      radial-gradient(1px 1px at 35% 45%, #fff 50%, transparent 52%),
+      radial-gradient(1px 1px at 65% 25%, #fff 50%, transparent 52%),
+      radial-gradient(1px 1px at 78% 72%, #fff 50%, transparent 52%),
+      radial-gradient(1px 1px at 28% 85%, #fff 50%, transparent 52%);
+    filter: drop-shadow(0 0 4px #b6ffe1);
+  }
 
-/* ▶ dynamic aspect ratio; default 4:3 until JS sets it per image */
-.tile{ position:relative; aspect-ratio:var(--ar, 4/3); border-radius:10px; overflow:hidden; margin:10px; z-index:1 }
-/* show entire image; no cropping */
-.tile img{ width:100%; height:100%; object-fit:contain; transition:transform .25s; background:#fffaf2 }
+  header{ text-align:center; padding:28px 16px 10px }
+  header h1{ margin:0; font-size:clamp(22px,3.5vw,34px); letter-spacing:.3px }
+  header p{ margin:6px 0 0; color:var(--muted) }
 
-@media(hover:hover){
-  .frame:hover{transform:translateY(-4px) scale(1.02)}
-  .frame:hover .tile img{transform:scale(1.02)}
-}
+  .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 26px }
+  .btn{
+    background:#111923; color:#e8fff5; border:1px solid #3a4856;
+    padding:10px 14px; border-radius:10px; font-size:.95rem; cursor:pointer;
+  }
+  .btn:hover{ background:#1a2330; }
 
-.meta h3{margin:2px 0 6px;font-size:1.12rem}
-.meta .sub{margin:0 0 10px;color:#7a5f49}
-.meta p{margin:0;color:#4a3a2b}
+  .back-link{
+    text-decoration:none; display:inline-block; padding:10px 14px;
+    background:#111923; color:#fff; border:1px solid #3a4856; border-radius:10px;
+  }
+  .back-link:hover{ background:#1a2330; color:#dcfff0; }
 
-.lightbox{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,8,6,.86);z-index:60}
-.lightbox.open{display:grid}
-.lightbox img{max-width:min(96vw,1600px);max-height:92vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
-.close{position:fixed;top:16px;right:18px;background:#442e1a;color:#fff;border:1px solid #b48a60;padding:9px 12px;border-radius:10px;z-index:61}
-</style></head><body>
-<header>
-  <h1>Animals</h1>
-  <p>Warm wood frames and museum plaques. Click any frame for full size.</p>
-  <a class="back" href="../index.html">← Return to Lobby Map</a>
-</header>
+  .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
 
-<div class="shell"><div id="cards" class="cards"></div></div>
+  .cards{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+    gap:34px;
+  }
+  .card{
+    display:grid;
+    grid-template-columns: 380px 1fr;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width: 860px){ .card{ grid-template-columns: 1fr; } }
 
-<div id="lb" class="lightbox" aria-modal="true" role="dialog">
-  <button class="close" id="c">Close ✕</button><img id="img" alt="">
-</div>
+  .frame{
+    position:relative; display:block; cursor:pointer;
+    border:6px solid var(--frame); border-radius:18px;
+    background:linear-gradient(180deg, #0e141a, #151d24);
+    box-shadow: var(--tile-shadow);
+    transition: transform .22s ease, box-shadow .22s ease;
+    overflow:hidden;
+  }
+  .frame::before{
+    content:""; position:absolute; inset:6px;
+    background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0e151c 60%);
+    border-radius:14px;
+    box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
+  }
+  .tile{ position:relative; aspect-ratio: 4 / 3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
+  .tile img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
+  .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
+  @media (hover:hover){ .frame:hover .tile img{ transform: scale(1.08); } }
+
+  .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
+  .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
+  .meta p{ margin:0; color:#e5fff7; line-height:1.45; }
+
+  .lightbox{
+    position:fixed; inset:0; display:none; place-items:center;
+    background: rgba(3,6,12,.86); z-index:60;
+  }
+  .lightbox.open{ display:grid; }
+  .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
+  .closeBtn{
+    position:fixed; top:16px; right:18px; z-index:61;
+    background:#111923; color:#fff; border:1px solid #3a4856;
+    padding:10px 14px; border-radius:10px; cursor:pointer;
+  }
+
+  .missing{
+    position:absolute; inset:8px; display:grid; place-items:center;
+    border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a;
+    border-radius:12px; font-size:.9rem; text-align:center; padding:8px;
+  }
+
+  /* Captions panel (template generator) */
+  dialog{ border:1px solid #2e3a46; border-radius:12px; padding:16px; background:#0f1720; color:#eafff7; width:min(920px,96vw) }
+  dialog::backdrop{ background:rgba(0,0,0,.55) }
+  textarea{ width:100%; min-height:280px; background:#0b141a; color:#eafff7; border:1px solid #2e3a46; border-radius:8px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.95rem }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Animals</h1>
+    <p>Modern frames with plaques. Hover to peek; click a frame for full size.</p>
+    <div class="actions">
+      <a href="../index.html" class="back-link">← Return to Lobby Map</a>
+      <button class="btn" id="btnTemplate">Captions Template</button>
+      <button class="btn" id="btnDownload">Download captions.json</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <div id="cards" class="cards" aria-live="polite"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" aria-modal="true" role="dialog">
+    <button class="closeBtn" id="closeBtn" aria-label="Close">Close ✕</button>
+    <img id="lightImg" alt="">
+  </div>
+
+  <!-- Captions template dialog -->
+  <dialog id="dlg">
+    <h3 style="margin:0 0 10px">captions.json template (edit then download & upload alongside this page)</h3>
+    <p style="margin:0 0 10px; color:#bfe4d3">Keys are the exact filenames (case-sensitive) located in <code>img/</code>. You may safely change <em>title</em> and <em>desc</em>.</p>
+    <textarea id="capText"></textarea>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
+      <button class="btn" id="dlgClose">Close</button>
+    </div>
+  </dialog>
 
 <script>
-const FILES=["IMG_0210.PNG","IMG_0222.PNG","IMG_0225.PNG","IMG_0229.PNG","IMG_0232.PNG"];
-const DESCRIPTIONS={
-  "IMG_0210.PNG":"Study in motion—fur, light, and instinct.",
-  "IMG_0222.PNG":"Companionship at rest; the quiet of the wild."
-};
-const ROOM="Animals", cards=document.getElementById('cards');
-const pretty=f=>f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+/**
+ * HOW THIS WORKS
+ * 1) Place images in: room-Animals/img/
+ * 2) Option A (recommended): create files.json (["file1.jpg","file2.png",...])
+ *    Option B: edit the inline FILES array below.
+ * 3) (Optional) Add captions.json: {"file.jpg":{"title":"New Title","desc":"Write-up..."}}
+ *    Titles + descriptions will override the defaults derived from filenames.
+ */
 
-for(const f of FILES){
-  const t=pretty(f),src='img/'+encodeURIComponent(f),d=DESCRIPTIONS[f]||'Add commentary for this artwork.';
-  const el=document.createElement('article'); el.className='card';
-  el.innerHTML=`<a href="#" class="frame" data-src="${src}" data-title="${t}">
-    <div class="tile"><img src="${src}" alt="${t}" decoding="async" loading="lazy"></div></a>
-    <div class="meta"><h3>${t}</h3><p class="sub"><strong>${ROOM}</strong> · <code>${f}</code></p><p>${d}</p></div>`;
+const ROOM_NAME = "Animals";
 
-  // 👇 Set the frame’s aspect-ratio to the image’s intrinsic ratio
-  const img = el.querySelector('img');
-  const tile = el.querySelector('.tile');
-  img.addEventListener('load', () => {
-    const w = img.naturalWidth || 4, h = img.naturalHeight || 3;
-    tile.style.setProperty('--ar', `${w} / ${h}`); // e.g., "1080 / 1920" (portrait)
-  });
+/* ---- Option B fallback list (edit these to your actual filenames) ---- */
+const FILES_FALLBACK = [
+  // Replace with your real filenames in img/
+  "lion_001.jpg",
+  "tiger-forest.png",
+  "eagle 01.JPG",
+  "red-fox.jpeg"
+];
 
-  el.querySelector('.frame').addEventListener('click',e=>{e.preventDefault();open(src,t)});
-  cards.appendChild(el);
+/* Attempt to load files.json; fall back to FILES_FALLBACK if not found */
+async function loadFiles(){
+  try{
+    const r = await fetch('files.json', {cache:'no-store'});
+    if(!r.ok) throw new Error('no files.json');
+    const list = await r.json();
+    if(!Array.isArray(list) || !list.length) throw new Error('files.json empty');
+    return list;
+  }catch{
+    return FILES_FALLBACK;
+  }
 }
 
-const lb=document.getElementById('lb'),im=document.getElementById('img'); document.getElementById('c').onclick=close;
-lb.addEventListener('click',e=>{if(e.target===lb)close()}); document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+/* Attempt to load captions.json; return {} if not present */
+async function loadCaptions(){
+  try{
+    const r = await fetch('captions.json', {cache:'no-store'});
+    if(!r.ok) throw new Error('no captions');
+    const map = await r.json();
+    return (map && typeof map === 'object') ? map : {};
+  }catch{
+    return {};
+  }
+}
 
-function open(src,alt){im.src=src;im.alt=alt;lb.classList.add('open');document.body.style.overflow='hidden'}
-function close(){lb.classList.remove('open');im.src='';document.body.style.overflow=''}
+const cardsEl = document.getElementById('cards');
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightImg');
+const closeBtn = document.getElementById('closeBtn');
+
+function prettyTitle(file){
+  return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+}
+const urlFor = f => `img/${encodeURIComponent(f)}`;
+
+function buildCard(file, caption){
+  const title = caption?.title || prettyTitle(file);
+  const desc  = caption?.desc  || "Add a description for this artwork in captions.json.";
+  const srcs  = [file]; // single canonical name—recommend ASCII/hyphens; spaces are URL-encoded.
+
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.innerHTML = `
+    <a href="#" class="frame">
+      <div class="tile">
+        <img alt="${title}" decoding="async" loading="lazy">
+        <div class="missing" hidden>Missing: <br><code>${file}</code></div>
+      </div>
+    </a>
+    <div class="meta">
+      <h3>${title}</h3>
+      <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9d7c3">${file}</code></p>
+      <p>${desc}</p>
+    </div>
+  `;
+
+  const link = card.querySelector('.frame');
+  const img  = card.querySelector('img');
+  const miss = card.querySelector('.missing');
+
+  let i = 0;
+  function tryNext(){
+    if (i >= srcs.length){
+      miss.hidden = false;
+      img.style.objectFit = 'contain';
+      img.style.background = '#2a2f3a';
+      return;
+    }
+    img.src = urlFor(srcs[i++]);
+  }
+  img.addEventListener('error', tryNext);
+  img.addEventListener('load', () => { miss.hidden = true; });
+  tryNext();
+
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!img.src) return;
+    openLightbox(img.src, img.alt);
+  });
+
+  return card;
+}
+
+function openLightbox(src, alt){
+  lbImg.src = src; lbImg.alt = alt;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  lb.classList.remove('open'); lbImg.src = '';
+  document.body.style.overflow = '';
+}
+lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
+closeBtn.addEventListener('click', closeLightbox);
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
+
+/* ----- Render flow ----- */
+let currentFiles = [];
+let currentCaptions = {};
+
+(async function init(){
+  currentFiles = await loadFiles();
+  currentCaptions = await loadCaptions();
+
+  // Clear and render
+  cardsEl.innerHTML = '';
+  currentFiles.forEach(f => {
+    const cap = currentCaptions[f] || null;
+    cardsEl.appendChild(buildCard(f, cap));
+  });
+})();
+
+/* ----- Captions template & download helpers ----- */
+const btnTemplate = document.getElementById('btnTemplate');
+const btnDownload = document.getElementById('btnDownload');
+const dlg = document.getElementById('dlg');
+const dlgClose = document.getElementById('dlgClose');
+const capText = document.getElementById('capText');
+
+function makeTemplate(){
+  const obj = {};
+  (currentFiles.length ? currentFiles : FILES_FALLBACK).forEach(f => {
+    obj[f] = {
+      title: currentCaptions[f]?.title || prettyTitle(f),
+      desc:  currentCaptions[f]?.desc  || "Write a short artist statement or description here."
+    };
+  });
+  return JSON.stringify(obj, null, 2);
+}
+
+btnTemplate.addEventListener('click', () => {
+  capText.value = makeTemplate();
+  dlg.showModal();
+});
+dlgClose.addEventListener('click', () => dlg.close());
+
+btnDownload.addEventListener('click', () => {
+  const blob = new Blob([makeTemplate()], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'captions.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
 </script>
-</body></html>
+</body>
+</html>
