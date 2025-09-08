@@ -24,6 +24,7 @@
   header{ text-align:center; padding:28px 16px 10px }
   header h1{ margin:0; font-size:clamp(22px,3.5vw,34px) }
   header p{ margin:6px 0 0; color:var(--muted) }
+
   .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 26px }
   .btn,.linkbtn{
     background:#111923; color:#e8fff5; border:1px solid #3a4856;
@@ -61,7 +62,12 @@
   .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
   .closeBtn{ position:fixed; top:16px; right:18px; z-index:61; background:#111923; color:#fff; border:1px solid #3a4856; padding:10px 14px; border-radius:10px; cursor:pointer; }
 
-  .missing{ position:absolute; inset:8px; display:grid; place-items:center; border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a; border-radius:12px; font-size:.9rem; text-align:center; padding:8px; }
+  /* “Missing” overlay if a specific file isn’t deployed */
+  .missing{
+    position:absolute; inset:8px; display:grid; place-items:center;
+    border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a;
+    border-radius:12px; font-size:.9rem; text-align:center; padding:8px;
+  }
 </style>
 </head>
 <body>
@@ -76,7 +82,193 @@
   </header>
 
   <div class="shell">
-    <div id="cards" class="cards" aria-live="polite"></div>
+    <div id="cards" class="cards" aria-live="polite">
+
+      <!-- === ONE CARD PER IMAGE (literal filenames with spaces) === -->
+      <!-- Copy block and change the filename to add more. -->
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 8.57.00 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 8.57.00 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 8.57.00 AM.png" alt="Screen Shot 2025 09 08 at 8.57.00 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 8.57.00 AM.png">Screen Shot 2025 09 08 at 8.57.00 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 8.57.00 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 8.57.00 AM.png">File 1.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 8.57.30 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 8.57.30 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 8.57.30 AM.png" alt="Screen Shot 2025 09 08 at 8.57.30 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 8.57.30 AM.png">Screen Shot 2025 09 08 at 8.57.30 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 8.57.30 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 8.57.30 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 8.57.34 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 8.57.34 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 8.57.34 AM.png" alt="Screen Shot 2025 09 08 at 8.57.34 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 8.57.34 AM.png">Screen Shot 2025 09 08 at 8.57.34 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 8.57.34 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 8.57.34 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 8.58.29 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 8.58.29 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 8.58.29 AM.png" alt="Screen Shot 2025 09 08 at 8.58.29 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 8.58.29 AM.png">Screen Shot 2025 09 08 at 8.58.29 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 8.58.29 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 8.58.29 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.00.26 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.00.26 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.00.26 AM.png" alt="Screen Shot 2025 09 08 at 9.00.26 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.00.26 AM.png">Screen Shot 2025 09 08 at 9.00.26 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.00.26 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.00.26 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.00.46 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.00.46 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.00.46 AM.png" alt="Screen Shot 2025 09 08 at 9.00.46 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.00.46 AM.png">Screen Shot 2025 09 08 at 9.00.46 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.00.46 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.00.46 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.01.14 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.01.14 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.01.14 AM.png" alt="Screen Shot 2025 09 08 at 9.01.14 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.01.14 AM.png">Screen Shot 2025 09 08 at 9.01.14 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.01.14 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.01.14 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.04.36 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.04.36 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.04.36 AM.png" alt="Screen Shot 2025 09 08 at 9.04.36 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.04.36 AM.png">Screen Shot 2025 09 08 at 9.04.36 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.04.36 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.04.36 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.05.04 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.05.04 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.05.04 AM.png" alt="Screen Shot 2025 09 08 at 9.05.04 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.05.04 AM.png">Screen Shot 2025 09 08 at 9.05.04 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.05.04 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.05.04 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.06.16 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.06.16 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.06.16 AM.png" alt="Screen Shot 2025 09 08 at 9.06.16 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.06.16 AM.png">Screen Shot 2025 09 08 at 9.06.16 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.06.16 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.06.16 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.06.29 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.06.29 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.06.29 AM.png" alt="Screen Shot 2025 09 08 at 9.06.29 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.06.29 AM.png">Screen Shot 2025 09 08 at 9.06.29 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.06.29 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.06.29 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.07.13 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.07.13 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.07.13 AM.png" alt="Screen Shot 2025 09 08 at 9.07.13 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.07.13 AM.png">Screen Shot 2025 09 08 at 9.07.13 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.07.13 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.07.13 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.07.45 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.07.45 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.07.45 AM.png" alt="Screen Shot 2025 09 08 at 9.07.45 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.07.45 AM.png">Screen Shot 2025 09 08 at 9.07.45 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.07.45 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.07.45 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <a href="img/Screen Shot 2025-09-08 at 9.08.34 AM.png" class="frame" data-title="Screen Shot 2025 09 08 at 9.08.34 AM">
+          <div class="tile">
+            <img src="img/Screen Shot 2025-09-08 at 9.08.34 AM.png" alt="Screen Shot 2025 09 08 at 9.08.34 AM" onerror="showMissing(this)">
+          </div>
+        </a>
+        <div class="meta">
+          <h3 data-key="Screen Shot 2025-09-08 at 9.08.34 AM.png">Screen Shot 2025 09 08 at 9.08.34 AM</h3>
+          <p class="sub"><strong>Animals</strong> · <code>Screen Shot 2025-09-08 at 9.08.34 AM.png</code></p>
+          <p data-desc="Screen Shot 2025-09-08 at 9.08.34 AM.png">Write a short artist statement or description here.</p>
+        </div>
+      </article>
+
+    </div>
   </div>
 
   <!-- Lightbox -->
@@ -85,116 +277,48 @@
     <img id="lightImg" alt="">
   </div>
 
-  <!-- Captions template dialog -->
-  <dialog id="dlgCap" style="border:1px solid #2e3a46; border-radius:12px; padding:16px; background:#0f1720; color:#eafff7; width:min(920px,96vw)">
-    <h3 style="margin:0 0 10px">captions.json template (edit, then download & upload beside this page)</h3>
-    <p style="margin:0 0 10px; color:#bfe4d3">Keys are exact filenames (case-sensitive) in <code>img/</code>. Change <em>title</em> and <em>desc</em> freely.</p>
-    <textarea id="capText" style="width:100%; min-height:240px; background:#0b141a; color:#eafff7; border:1px solid #2e3a46; border-radius:8px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace; font-size:.95rem"></textarea>
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
-      <button class="btn" id="capClose">Close</button>
-    </div>
-  </dialog>
-
 <script>
-/* Exact filenames (with spaces) */
-const FILES = [
-  "Screen Shot 2025-09-08 at 8.57.00 AM.png",
-  "Screen Shot 2025-09-08 at 8.57.30 AM.png",
-  "Screen Shot 2025-09-08 at 8.57.34 AM.png",
-  "Screen Shot 2025-09-08 at 8.58.29 AM.png",
-  "Screen Shot 2025-09-08 at 9.00.26 AM.png",
-  "Screen Shot 2025-09-08 at 9.00.46 AM.png",
-  "Screen Shot 2025-09-08 at 9.01.14 AM.png",
-  "Screen Shot 2025-09-08 at 9.04.36 AM.png",
-  "Screen Shot 2025-09-08 at 9.05.04 AM.png",
-  "Screen Shot 2025-09-08 at 9.06.16 AM.png",
-  "Screen Shot 2025-09-08 at 9.06.29 AM.png",
-  "Screen Shot 2025-09-08 at 9.07.13 AM.png",
-  "Screen Shot 2025-09-08 at 9.07.45 AM.png",
-  "Screen Shot 2025-09-08 at 9.08.34 AM.png"
-];
-
-/* Absolute base that matches your confirmed working URL */
-const ABS_BASE = "https://cjmurphy4810.github.io/VirtualArtGallary/room-Animals/img/";
-
-/* Captions override (optional) */
-async function loadCaptions(){
-  try{
-    const r = await fetch('captions.json', {cache:'no-store'});
-    if(!r.ok) throw 0;
-    const map = await r.json();
-    return (map && typeof map === 'object') ? map : {};
-  }catch{ return {}; }
+/* Show a clear inline message if any particular file is not deployed yet */
+function showMissing(img){
+  const wrap = img.closest('.tile');
+  const box = document.createElement('div');
+  box.className = 'missing';
+  box.innerHTML = 'Missing:<br><small><code>' + img.getAttribute('src') + '</code></small>';
+  wrap.appendChild(box);
+  img.style.display = 'none';
 }
 
-const ROOM_NAME = "Animals";
-const cardsEl = document.getElementById('cards');
+/* Lightbox: uses the anchor's href (already literal path with spaces) */
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lightImg');
 const closeBtn = document.getElementById('closeBtn');
 
-const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
-
-function buildCard(file, caption){
-  const src   = ABS_BASE + encodeURIComponent(file);
-  const title = caption?.title || prettyTitle(file);
-  const desc  = caption?.desc  || "Write a short artist statement or description here (override via captions.json).";
-
-  const card = document.createElement('article');
-  card.className = 'card';
-  card.innerHTML = `
-    <a href="#" class="frame">
-      <div class="tile">
-        <img alt="${title}" decoding="async" loading="lazy">
-        <div class="missing" hidden>
-          Missing:<br><small><a href="${src}" target="_blank" rel="noopener">${src}</a></small>
-        </div>
-      </div>
-    </a>
-    <div class="meta">
-      <h3>${title}</h3>
-      <p class="sub"><strong>${ROOM_NAME}</strong> · <code style="font-size:.9rem;color:#a9d7c3">${file}</code></p>
-      <p>${desc}</p>
-    </div>
-  `;
-
-  const img  = card.querySelector('img');
-  const miss = card.querySelector('.missing');
-  const link = card.querySelector('.frame');
-
-  img.addEventListener('error', () => {
-    miss.hidden = false;
-    img.style.objectFit = 'contain';
-    img.style.background = '#2a2f3a';
-  });
-  img.addEventListener('load', () => { miss.hidden = true; });
-  img.src = src;
-
-  link.addEventListener('click', (e) => {
+document.querySelectorAll('.frame').forEach(a=>{
+  a.addEventListener('click', (e)=>{
     e.preventDefault();
-    if (img.src) openLightbox(img.src, img.alt);
+    lbImg.src = a.getAttribute('href');
+    lbImg.alt = a.dataset.title || '';
+    lb.classList.add('open'); document.body.style.overflow='hidden';
   });
-
-  return card;
-}
-
-function openLightbox(src, alt){
-  lbImg.src = src; lbImg.alt = alt;
-  lb.classList.add('open'); document.body.style.overflow = 'hidden';
-}
-function closeLightbox(){
-  lb.classList.remove('open'); lbImg.src = '';
-  document.body.style.overflow = '';
-}
-lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
+});
+function closeLightbox(){ lb.classList.remove('open'); lbImg.src=''; document.body.style.overflow=''; }
+lb.addEventListener('click', e=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
 
-/* Render */
-(async function init(){
-  const captions = await loadCaptions();
-  cardsEl.innerHTML = '';
-  FILES.forEach(f => cardsEl.appendChild(buildCard(f, captions[f])));
+/* Optional captions.json: overrides only text, never paths */
+(async function loadCaptions(){
+  try{
+    const r = await fetch('captions.json', {cache:'no-store'});
+    if(!r.ok) return;
+    const map = await r.json();
+    Object.entries(map).forEach(([file, {title, desc}])=>{
+      const h = document.querySelector(`h3[data-key="${CSS.escape(file)}"]`);
+      const p = document.querySelector(`p[data-desc="${CSS.escape(file)}"]`);
+      if(h && title) h.textContent = title;
+      if(p && desc)  p.textContent = desc;
+    });
+  }catch{}
 })();
 </script>
 </body>
