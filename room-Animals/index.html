@@ -7,12 +7,15 @@
   --frame:#6b4c2a; --frameEdge:#8a6137; --mat:#fffaf2; --matEdge:#e9dcc7;
   --shadow:0 18px 40px rgba(0,0,0,.25);
 }
-*{box-sizing:border-box} body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
    radial-gradient(900px 600px at 80% 10%, rgba(170,120,60,.15), transparent 60%),
    radial-gradient(900px 600px at 10% 90%, rgba(120,190,120,.12), transparent 60%),
    linear-gradient(180deg,var(--bg1),var(--bg2));
-  min-height:100svh}
+  min-height:100svh
+}
 header{text-align:center;padding:28px 16px 6px}
 header h1{margin:0;font-size:clamp(22px,3.5vw,34px)}
 header p{margin:6px 0 0;color:var(--muted)}
@@ -22,16 +25,31 @@ header p{margin:6px 0 0;color:var(--muted)}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:34px}
 .card{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
 @media(max-width:860px){.card{grid-template-columns:1fr}}
-.frame{position:relative;display:block;cursor:pointer;border:8px solid var(--frame);border-radius:18px;
-  background:linear-gradient(180deg,#6f4e2d,#5c3f23);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s}
-.frame::before{content:"";position:absolute;inset:8px;border-radius:12px;background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#fff3e1 70%);
-  box-shadow:inset 0 0 0 1px var(--matEdge), inset 0 10px 18px rgba(0,0,0,.15)}
-.tile{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin:10px;z-index:1}
-.tile img{width:100%;height:100%;object-fit:cover;transition:transform .25s}
-@media(hover:hover){.frame:hover{transform:translateY(-4px) scale(1.02)} .frame:hover .tile img{transform:scale(1.06)}}
+
+.frame{
+  position:relative;display:block;cursor:pointer;border:8px solid var(--frame);border-radius:18px;
+  background:linear-gradient(180deg,#6f4e2d,#5c3f23);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s
+}
+.frame::before{
+  content:"";position:absolute;inset:8px;border-radius:12px;
+  background:radial-gradient(120% 130% at 50% 50%,var(--mat)0%,#fff3e1 70%);
+  box-shadow:inset 0 0 0 1px var(--matEdge), inset 0 10px 18px rgba(0,0,0,.15)
+}
+
+/* ▶ dynamic aspect ratio; default 4:3 until JS sets it per image */
+.tile{ position:relative; aspect-ratio:var(--ar, 4/3); border-radius:10px; overflow:hidden; margin:10px; z-index:1 }
+/* show entire image; no cropping */
+.tile img{ width:100%; height:100%; object-fit:contain; transition:transform .25s; background:#fffaf2 }
+
+@media(hover:hover){
+  .frame:hover{transform:translateY(-4px) scale(1.02)}
+  .frame:hover .tile img{transform:scale(1.02)}
+}
+
 .meta h3{margin:2px 0 6px;font-size:1.12rem}
 .meta .sub{margin:0 0 10px;color:#7a5f49}
 .meta p{margin:0;color:#4a3a2b}
+
 .lightbox{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,8,6,.86);z-index:60}
 .lightbox.open{display:grid}
 .lightbox img{max-width:min(96vw,1600px);max-height:92vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
@@ -42,8 +60,13 @@ header p{margin:6px 0 0;color:var(--muted)}
   <p>Warm wood frames and museum plaques. Click any frame for full size.</p>
   <a class="back" href="../index.html">← Return to Lobby Map</a>
 </header>
+
 <div class="shell"><div id="cards" class="cards"></div></div>
-<div id="lb" class="lightbox" aria-modal="true" role="dialog"><button class="close" id="c">Close ✕</button><img id="img" alt=""></div>
+
+<div id="lb" class="lightbox" aria-modal="true" role="dialog">
+  <button class="close" id="c">Close ✕</button><img id="img" alt="">
+</div>
+
 <script>
 const FILES=["IMG_0210.PNG","IMG_0222.PNG","IMG_0225.PNG","IMG_0229.PNG","IMG_0232.PNG"];
 const DESCRIPTIONS={
@@ -52,16 +75,30 @@ const DESCRIPTIONS={
 };
 const ROOM="Animals", cards=document.getElementById('cards');
 const pretty=f=>f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+
 for(const f of FILES){
   const t=pretty(f),src='img/'+encodeURIComponent(f),d=DESCRIPTIONS[f]||'Add commentary for this artwork.';
   const el=document.createElement('article'); el.className='card';
   el.innerHTML=`<a href="#" class="frame" data-src="${src}" data-title="${t}">
-    <div class="tile"><img src="${src}" alt="${t}"></div></a>
+    <div class="tile"><img src="${src}" alt="${t}" decoding="async" loading="lazy"></div></a>
     <div class="meta"><h3>${t}</h3><p class="sub"><strong>${ROOM}</strong> · <code>${f}</code></p><p>${d}</p></div>`;
-  el.querySelector('.frame').addEventListener('click',e=>{e.preventDefault();open(src,t)}); cards.appendChild(el);
+
+  // 👇 Set the frame’s aspect-ratio to the image’s intrinsic ratio
+  const img = el.querySelector('img');
+  const tile = el.querySelector('.tile');
+  img.addEventListener('load', () => {
+    const w = img.naturalWidth || 4, h = img.naturalHeight || 3;
+    tile.style.setProperty('--ar', `${w} / ${h}`); // e.g., "1080 / 1920" (portrait)
+  });
+
+  el.querySelector('.frame').addEventListener('click',e=>{e.preventDefault();open(src,t)});
+  cards.appendChild(el);
 }
+
 const lb=document.getElementById('lb'),im=document.getElementById('img'); document.getElementById('c').onclick=close;
 lb.addEventListener('click',e=>{if(e.target===lb)close()}); document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
 function open(src,alt){im.src=src;im.alt=alt;lb.classList.add('open');document.body.style.overflow='hidden'}
 function close(){lb.classList.remove('open');im.src='';document.body.style.overflow=''}
-</script></body></html>
+</script>
+</body></html>
