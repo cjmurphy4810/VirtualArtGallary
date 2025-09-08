@@ -33,15 +33,39 @@
   .btn:hover,.linkbtn:hover{ background:#1a2330; }
 
   .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
+
+  /* Grid of cards; we’ll still auto-fit but we’ll ALSO do a row-wise pass in JS */
   .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap:34px; }
 
-  /* Card: left column width varies via size classes */
-  .card{ display:grid; gap:22px; align-items:start; grid-template-columns: var(--leftW,380px) 1fr; }
-  @media (max-width: 860px){ .card{ grid-template-columns: 1fr; } }
+  /* Card uses areas so we can flip label side with a class */
+  .card{
+    --leftW: 380px;            /* default “art” width column */
+    --lift: 0px;               /* vertical offset applied when staggered */
+    display:grid; gap:22px; align-items:start;
+    grid-template-columns: var(--leftW) 1fr;
+    grid-template-areas: "frame meta";
+    margin-top: var(--lift);
+  }
+  .card.flip{
+    grid-template-columns: 1fr var(--leftW);
+    grid-template-areas: "meta frame";
+  }
+  .frame{ grid-area: frame; }
+  .meta { grid-area: meta; }
 
-  /* ---------- FRAMES (base) ---------- */
+  @media (max-width: 860px){
+    .card, .card.flip{
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "frame"
+        "meta";
+      margin-top: 0 !important;   /* disable staggering on small screens */
+    }
+  }
+
+  /* ---------- FRAMES (base + finishes you already liked) ---------- */
   .frame{
-    --tilt: 0deg;           /* set per-card in JS */
+    --tilt: 0deg;
     position:relative; display:block; cursor:pointer;
     border:10px solid var(--frame); border-radius:18px;
     background:linear-gradient(180deg, #0e141a, #151d24);
@@ -51,19 +75,15 @@
     transform: rotate(var(--tilt));
   }
   .frame::before{
-    /* mat */
     content:""; position:absolute; inset:8px; border-radius:14px;
     background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0e151c 60%);
     box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
   .tile{ position:relative; aspect-ratio: var(--ar, 4/3); border-radius:12px; overflow:hidden; margin:12px; z-index:1; }
-  .tile img{
-    width:100%; height:100%; object-fit:contain; object-position:center;
-    display:block; transition: transform .25s ease; background:#0e151c;
-  }
+  .tile img{ width:100%; height:100%; object-fit:contain; object-position:center; display:block; transition: transform .25s ease; background:#0e151c; }
   .frame:hover{ transform: rotate(var(--tilt)) translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) inset }
 
-  /* ---------- SHAPES (rounded recipes) ---------- */
+  /* Shapes */
   .shape-a .frame{ border-radius:28px }
   .shape-a .frame::before, .shape-a .tile{ border-radius:22px }
   .shape-b .frame{ border-radius:14px 28px 18px 32px }
@@ -76,8 +96,7 @@
   .shape-e .frame::before, .shape-e .tile{ border-radius:12px 12px 36px 12px }
   .shape-f .frame{ border-radius:22px; }
 
-  /* ---------- FINISHES (decorative borders via gradient layers) ---------- */
-  /* technique: gradient fill for padding-box + conic gradient for border-box */
+  /* Finishes */
   .finish-gilded .frame{
     border:12px solid transparent;
     background:
@@ -116,7 +135,7 @@
     box-shadow: var(--tile-shadow), 0 10px 26px rgba(34,170,160,.18);
   }
 
-  /* ---------- SIZE VARIANTS (affect left column width) ---------- */
+  /* Sizes (left media column width) */
   .size-s{ --leftW: 320px; }
   .size-m{ --leftW: 380px; } /* default */
   .size-l{ --leftW: 460px; }
@@ -132,7 +151,7 @@
   .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
   .closeBtn{ position:fixed; top:16px; right:18px; z-index:61; background:#111923; color:#fff; border:1px solid #3a4856; padding:10px 14px; border-radius:10px; cursor:pointer; }
 
-  /* Missing overlay (only when a specific file is absent) */
+  /* Missing overlay */
   .missing{
     position:absolute; inset:8px; display:grid; place-items:center;
     border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a;
@@ -162,7 +181,7 @@
   </div>
 
 <script>
-/* ===== 1) YOUR FILES (literal names with spaces; mixed .png/.PNG OK) ===== */
+/* ===== FILENAMES (mixed .png/.PNG ok) ===== */
 const FILES = [
   "Screen Shot 2025-09-08 at 8.57.00 AM.png",
   "Screen Shot 2025-09-08 at 8.57.30 AM.png",
@@ -174,13 +193,12 @@ const FILES = [
   "Screen Shot 2025-09-08 at 9.04.36 AM.png",
   "Screen Shot 2025-09-08 at 9.05.04 AM.png",
   "Screen Shot 2025-09-08 at 9.06.16 AM.png",
-  "Screen Shot 2025-09-08 at 9.06.29 AM.PNG",   // uppercase extension demo
+  "Screen Shot 2025-09-08 at 9.06.29 AM.PNG",
   "Screen Shot 2025-09-08 at 9.07.13 AM.png",
   "Screen Shot 2025-09-08 at 9.07.45 AM.png",
   "Screen Shot 2025-09-08 at 9.08.34 AM.png"
 ];
 
-/* ===== 2) Optional captions.json overrides (title & desc) ===== */
 async function loadCaptions(){
   try{
     const r = await fetch('captions.json', {cache:'no-store'});
@@ -190,7 +208,6 @@ async function loadCaptions(){
   }catch{ return {}; }
 }
 
-/* ===== 3) Helpers ===== */
 const ROOM_NAME = "Animals";
 const cardsEl = document.getElementById('cards');
 const lb = document.getElementById('lightbox');
@@ -201,7 +218,7 @@ const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(
 const rand = (min,max)=> Math.random()*(max-min)+min;
 const choose = arr => arr[Math.floor(Math.random()*arr.length)];
 
-/* fallback: try .png ⇄ .PNG and encoded spaces */
+/* PNG/.PNG + encoded-space fallback */
 function installSmartFallback(img, rawPath){
   const [base, ext] = rawPath.split(/\.(?=[^.]+$)/);
   const toggled = ext === 'png' ? 'PNG' : ext === 'PNG' ? 'png' : null;
@@ -213,12 +230,11 @@ function installSmartFallback(img, rawPath){
   img.addEventListener('error', ()=>{ i+=1; if(i<tries.length) img.src = tries[i]; });
 }
 
-/* SHAPES / FINISHES / SIZES */
+/* Visual varieties */
 const SHAPES   = ['shape-a','shape-b','shape-c','shape-d','shape-e','shape-f'];
 const FINISHES = ['finish-gilded','finish-brass','finish-ebony','finish-walnut','finish-verdigris'];
-const SIZES    = ['size-s','size-m','size-m','size-l']; // weighted (more mediums)
+const SIZES    = ['size-s','size-m','size-m','size-l']; // weighted
 
-/* build one card */
 function buildCard(file, caption){
   const article = document.createElement('article');
   article.className = `card ${choose(SHAPES)} ${choose(FINISHES)} ${choose(SIZES)}`;
@@ -226,9 +242,8 @@ function buildCard(file, caption){
   const src   = `img/${file}`;
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Write a short artist statement or description here.";
-  const code  = `<code>${file}</code>`;
 
-  // tiny random tilt so frames feel “hung”
+  // tiny random tilt
   const tilt = rand(-0.4, 0.4).toFixed(3) + 'deg';
 
   article.innerHTML = `
@@ -237,7 +252,7 @@ function buildCard(file, caption){
     </a>
     <div class="meta">
       <h3>${title}</h3>
-      <p class="sub"><strong>${ROOM_NAME}</strong> · ${code}</p>
+      <p class="sub"><strong>${ROOM_NAME}</strong> · <code>${file}</code></p>
       <p>${desc}</p>
     </div>
   `;
@@ -253,16 +268,14 @@ function buildCard(file, caption){
     tile.style.setProperty('--ar', `${w} / ${h}`);
   });
 
-  // show message only after all retries fail
-  let failCount = 0;
   img.addEventListener('error', ()=>{
-    failCount++;
-    if (failCount >= 3){
-      const box = document.createElement('div');
-      box.className = 'missing';
-      box.innerHTML = 'Missing:<br><small><code>'+ (img.currentSrc || src) +'</code></small>';
-      tile.appendChild(box); img.style.display='none';
-    }
+    // after final retry, show a missing banner
+    if (img._failed) return;
+    img._failed = true;
+    const box = document.createElement('div');
+    box.className = 'missing';
+    box.innerHTML = 'Missing:<br><small><code>'+ (img.currentSrc || src) +'</code></small>';
+    tile.appendChild(box); img.style.display='none';
   });
 
   img.src = src;
@@ -283,14 +296,73 @@ lb.addEventListener('click', e=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
 
+/* --- Label layout engine ---------------------------------------------
+   For each visual row:
+     - Alternate meta side: left/right
+     - For every second card in the row (1, 3, ...), lift it ~½ its art height
+       so labels interleave and don’t collide.
+-----------------------------------------------------------------------*/
+function arrangeLabels(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  if (!cards.length) return;
+
+  // Reset
+  cards.forEach(c=>{
+    c.classList.remove('flip');
+    c.style.setProperty('--lift','0px');
+  });
+
+  // Group cards by row (same offsetTop within a tolerance)
+  const rows = [];
+  let current = [], lastTop = null, tol = 4;
+  cards.forEach(el=>{
+    const top = el.offsetTop;
+    if (lastTop === null || Math.abs(top - lastTop) <= tol){
+      current.push(el); lastTop = (lastTop===null?top:lastTop);
+    }else{
+      rows.push(current); current = [el]; lastTop = top;
+    }
+  });
+  if (current.length) rows.push(current);
+
+  // For each row, alternate label side and stagger every second item
+  rows.forEach((row, rowIdx)=>{
+    row.forEach((card, idx)=>{
+      const flip = (idx % 2 === 1);             // label on left for 2nd, 4th, ...
+      if (flip) card.classList.add('flip');
+
+      // Apply stagger only if not the first visual row
+      if (flip && rowIdx > 0){
+        const tile = card.querySelector('.tile');
+        const h = tile?.offsetHeight || 0;
+        const liftPx = Math.round(h * 0.5);     // raise by ~half art height
+        card.style.setProperty('--lift', `-${liftPx}px`);
+      }
+    });
+  });
+}
+
+// Debounce for resize and image loads
+let t;
+function scheduleArrange(){ clearTimeout(t); t = setTimeout(arrangeLabels, 60); }
+window.addEventListener('resize', scheduleArrange);
+
 /* Render */
 (async function init(){
   const captions = await loadCaptions();
   cardsEl.innerHTML = '';
-  FILES.forEach(f => cardsEl.appendChild(buildCard(f, captions[f])));
+  FILES.forEach(f => {
+    const card = buildCard(f, captions[f]);
+    cardsEl.appendChild(card);
+    // reflow after each image settles
+    const img = card.querySelector('img');
+    img.addEventListener('load', scheduleArrange);
+    img.addEventListener('error', scheduleArrange);
+  });
+  scheduleArrange();
 })();
 
-/* Captions helpers (you can remove these later) */
+/* Captions helpers (remove later if desired) */
 document.getElementById('btnCapTemplate')?.addEventListener('click', ()=>{
   const obj = {};
   FILES.forEach(f => { obj[f]={title:prettyTitle(f),desc:"Write a short artist statement or description here."}; });
