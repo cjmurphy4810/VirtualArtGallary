@@ -34,24 +34,20 @@
 
   .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
 
-  /* Grid of cards; we’ll still auto-fit but we’ll ALSO do a row-wise pass in JS */
-  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap:34px; }
+  /* Stable grid; each card is a self-contained box (no negative margins). */
+  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap:34px; }
 
-  /* Card uses areas so we can flip label side with a class */
+  /* Card: image column + label column; alternate with .flip (safe). */
   .card{
-    --leftW: 380px;            /* default “art” width column */
-    --lift: 0px;               /* vertical offset applied when staggered */
+    --mediaW: 380px;
     display:grid; gap:22px; align-items:start;
-    grid-template-columns: var(--leftW) 1fr;
+    grid-template-columns: var(--mediaW) 1fr;
     grid-template-areas: "frame meta";
-    margin-top: var(--lift);
   }
   .card.flip{
-    grid-template-columns: 1fr var(--leftW);
+    grid-template-columns: 1fr var(--mediaW);
     grid-template-areas: "meta frame";
   }
-  .frame{ grid-area: frame; }
-  .meta { grid-area: meta; }
 
   @media (max-width: 860px){
     .card, .card.flip{
@@ -59,20 +55,20 @@
       grid-template-areas:
         "frame"
         "meta";
-      margin-top: 0 !important;   /* disable staggering on small screens */
     }
   }
 
-  /* ---------- FRAMES (base + finishes you already liked) ---------- */
+  /* ---------- FRAMES (base + finishes) ---------- */
   .frame{
     --tilt: 0deg;
+    grid-area: frame;
     position:relative; display:block; cursor:pointer;
     border:10px solid var(--frame); border-radius:18px;
     background:linear-gradient(180deg, #0e141a, #151d24);
     box-shadow: var(--tile-shadow), 0 0 0 1px rgba(255,255,255,.05) inset;
     transition: transform .22s ease, box-shadow .22s ease;
     overflow:hidden;
-    transform: rotate(var(--tilt));
+    transform: rotate(var(--tilt));  /* visual only; does not affect layout box */
   }
   .frame::before{
     content:""; position:absolute; inset:8px; border-radius:14px;
@@ -80,8 +76,8 @@
     box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
   .tile{ position:relative; aspect-ratio: var(--ar, 4/3); border-radius:12px; overflow:hidden; margin:12px; z-index:1; }
-  .tile img{ width:100%; height:100%; object-fit:contain; object-position:center; display:block; transition: transform .25s ease; background:#0e151c; }
-  .frame:hover{ transform: rotate(var(--tilt)) translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) inset }
+  .tile img{ width:100%; height:100%; object-fit:contain; object-position:center; display:block; background:#0e151c; transition: transform .25s ease; }
+  .frame:hover{ transform: rotate(var(--tilt)) translateY(-2px) scale(1.01); box-shadow: 0 22px 54px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) inset }
 
   /* Shapes */
   .shape-a .frame{ border-radius:28px }
@@ -135,12 +131,8 @@
     box-shadow: var(--tile-shadow), 0 10px 26px rgba(34,170,160,.18);
   }
 
-  /* Sizes (left media column width) */
-  .size-s{ --leftW: 320px; }
-  .size-m{ --leftW: 380px; } /* default */
-  .size-l{ --leftW: 460px; }
-
-  /* Meta text */
+  /* Meta */
+  .meta{ grid-area: meta; min-width:0; } /* prevent overflow */
   .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
   .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
   .meta p{ margin:0; color:#e5fff7; line-height:1.45; }
@@ -181,7 +173,7 @@
   </div>
 
 <script>
-/* ===== FILENAMES (mixed .png/.PNG ok) ===== */
+/* === Filenames (mixed .png/.PNG fine) === */
 const FILES = [
   "Screen Shot 2025-09-08 at 8.57.00 AM.png",
   "Screen Shot 2025-09-08 at 8.57.30 AM.png",
@@ -218,7 +210,7 @@ const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(
 const rand = (min,max)=> Math.random()*(max-min)+min;
 const choose = arr => arr[Math.floor(Math.random()*arr.length)];
 
-/* PNG/.PNG + encoded-space fallback */
+/* .png ⇄ .PNG & encoded spaces fallback */
 function installSmartFallback(img, rawPath){
   const [base, ext] = rawPath.split(/\.(?=[^.]+$)/);
   const toggled = ext === 'png' ? 'PNG' : ext === 'PNG' ? 'png' : null;
@@ -230,21 +222,18 @@ function installSmartFallback(img, rawPath){
   img.addEventListener('error', ()=>{ i+=1; if(i<tries.length) img.src = tries[i]; });
 }
 
-/* Visual varieties */
+/* Visual variety: shapes & finishes only (no size randomness for stability) */
 const SHAPES   = ['shape-a','shape-b','shape-c','shape-d','shape-e','shape-f'];
 const FINISHES = ['finish-gilded','finish-brass','finish-ebony','finish-walnut','finish-verdigris'];
-const SIZES    = ['size-s','size-m','size-m','size-l']; // weighted
 
-function buildCard(file, caption){
+function buildCard(file, caption, index){
   const article = document.createElement('article');
-  article.className = `card ${choose(SHAPES)} ${choose(FINISHES)} ${choose(SIZES)}`;
+  article.className = `card ${choose(SHAPES)} ${choose(FINISHES)} ${index % 2 ? 'flip' : ''}`;
 
   const src   = `img/${file}`;
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Write a short artist statement or description here.";
-
-  // tiny random tilt
-  const tilt = rand(-0.4, 0.4).toFixed(3) + 'deg';
+  const tilt  = rand(-0.3, 0.3).toFixed(3) + 'deg';
 
   article.innerHTML = `
     <a href="${src}" class="frame" data-title="${title}" style="--tilt:${tilt}">
@@ -268,15 +257,9 @@ function buildCard(file, caption){
     tile.style.setProperty('--ar', `${w} / ${h}`);
   });
 
-  img.addEventListener('error', ()=>{
-    // after final retry, show a missing banner
-    if (img._failed) return;
-    img._failed = true;
-    const box = document.createElement('div');
-    box.className = 'missing';
-    box.innerHTML = 'Missing:<br><small><code>'+ (img.currentSrc || src) +'</code></small>';
-    tile.appendChild(box); img.style.display='none';
-  });
+  // If every fallback fails, show missing banner (no layout changes)
+  let tries=0;
+  img.addEventListener('error', ()=>{ tries++; if(tries>=3){ const box=document.createElement('div'); box.className='missing'; box.innerHTML='Missing:<br><small><code>'+ (img.currentSrc||src) +'</code></small>'; tile.appendChild(box); img.style.display='none'; }});
 
   img.src = src;
 
@@ -296,89 +279,12 @@ lb.addEventListener('click', e=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
 
-/* --- Label layout engine ---------------------------------------------
-   For each visual row:
-     - Alternate meta side: left/right
-     - For every second card in the row (1, 3, ...), lift it ~½ its art height
-       so labels interleave and don’t collide.
------------------------------------------------------------------------*/
-function arrangeLabels(){
-  const cards = Array.from(document.querySelectorAll('.card'));
-  if (!cards.length) return;
-
-  // Reset
-  cards.forEach(c=>{
-    c.classList.remove('flip');
-    c.style.setProperty('--lift','0px');
-  });
-
-  // Group cards by row (same offsetTop within a tolerance)
-  const rows = [];
-  let current = [], lastTop = null, tol = 4;
-  cards.forEach(el=>{
-    const top = el.offsetTop;
-    if (lastTop === null || Math.abs(top - lastTop) <= tol){
-      current.push(el); lastTop = (lastTop===null?top:lastTop);
-    }else{
-      rows.push(current); current = [el]; lastTop = top;
-    }
-  });
-  if (current.length) rows.push(current);
-
-  // For each row, alternate label side and stagger every second item
-  rows.forEach((row, rowIdx)=>{
-    row.forEach((card, idx)=>{
-      const flip = (idx % 2 === 1);             // label on left for 2nd, 4th, ...
-      if (flip) card.classList.add('flip');
-
-      // Apply stagger only if not the first visual row
-      if (flip && rowIdx > 0){
-        const tile = card.querySelector('.tile');
-        const h = tile?.offsetHeight || 0;
-        const liftPx = Math.round(h * 0.5);     // raise by ~half art height
-        card.style.setProperty('--lift', `-${liftPx}px`);
-      }
-    });
-  });
-}
-
-// Debounce for resize and image loads
-let t;
-function scheduleArrange(){ clearTimeout(t); t = setTimeout(arrangeLabels, 60); }
-window.addEventListener('resize', scheduleArrange);
-
 /* Render */
 (async function init(){
   const captions = await loadCaptions();
   cardsEl.innerHTML = '';
-  FILES.forEach(f => {
-    const card = buildCard(f, captions[f]);
-    cardsEl.appendChild(card);
-    // reflow after each image settles
-    const img = card.querySelector('img');
-    img.addEventListener('load', scheduleArrange);
-    img.addEventListener('error', scheduleArrange);
-  });
-  scheduleArrange();
+  FILES.forEach((f,i) => cardsEl.appendChild(buildCard(f, captions[f], i)));
 })();
-
-/* Captions helpers (remove later if desired) */
-document.getElementById('btnCapTemplate')?.addEventListener('click', ()=>{
-  const obj = {};
-  FILES.forEach(f => { obj[f]={title:prettyTitle(f),desc:"Write a short artist statement or description here."}; });
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
-document.getElementById('btnCapDownload')?.addEventListener('click', ()=>{
-  const obj = {};
-  FILES.forEach(f => { obj[f]={title:prettyTitle(f),desc:"Write a short artist statement or description here."}; });
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
 </script>
 </body>
 </html>
