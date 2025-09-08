@@ -6,15 +6,13 @@
 <title>Animals — Virtual Art Gallery of CJ Murphy</title>
 <style>
   :root{
-    /* Warm, natural palette for Animals room */
     --bg1:#0f1720; --bg2:#0b141a;
-    --accent1:#245a3d; --accent2:#2e7a52; --accentGlow: rgba(72,200,140,.14);
+    --accentGlow: rgba(72,200,140,.14);
     --frame:#1a1f26; --mat:#141a20; --mat-edge:#2b313a;
     --ink:#eef6f3; --muted:#bfe4d3; --subtle:#9ed5c0;
     --tile-shadow: 0 18px 40px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
-
   body{
     margin:0; color:var(--ink);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -24,94 +22,49 @@
       linear-gradient(180deg, var(--bg1), var(--bg2));
     min-height:100svh;
   }
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none; opacity:.6;
-    background:
-      radial-gradient(1px 1px at 15% 20%, #fff 50%, transparent 52%),
-      radial-gradient(1px 1px at 35% 45%, #fff 50%, transparent 52%),
-      radial-gradient(1px 1px at 65% 25%, #fff 50%, transparent 52%),
-      radial-gradient(1px 1px at 78% 72%, #fff 50%, transparent 52%),
-      radial-gradient(1px 1px at 28% 85%, #fff 50%, transparent 52%);
-    filter: drop-shadow(0 0 4px #b6ffe1);
-  }
-
   header{ text-align:center; padding:28px 16px 10px }
-  header h1{ margin:0; font-size:clamp(22px,3.5vw,34px); letter-spacing:.3px }
+  header h1{ margin:0; font-size:clamp(22px,3.5vw,34px) }
   header p{ margin:6px 0 0; color:var(--muted) }
-
   .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 26px }
-  .btn{
+  .btn,.linkbtn{
     background:#111923; color:#e8fff5; border:1px solid #3a4856;
-    padding:10px 14px; border-radius:10px; font-size:.95rem; cursor:pointer;
+    padding:10px 14px; border-radius:10px; font-size:.95rem; cursor:pointer; text-decoration:none;
   }
-  .btn:hover{ background:#1a2330; }
-
-  .back-link{
-    text-decoration:none; display:inline-block; padding:10px 14px;
-    background:#111923; color:#fff; border:1px solid #3a4856; border-radius:10px;
-  }
-  .back-link:hover{ background:#1a2330; color:#dcfff0; }
-
+  .btn:hover,.linkbtn:hover{ background:#1a2330; }
   .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
-
   .cards{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-    gap:34px;
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap:34px;
   }
   .card{
-    display:grid;
-    grid-template-columns: 380px 1fr;
-    gap:22px;
-    align-items:start;
+    display:grid; grid-template-columns: 380px 1fr; gap:22px; align-items:start;
   }
   @media (max-width: 860px){ .card{ grid-template-columns: 1fr; } }
-
   .frame{
     position:relative; display:block; cursor:pointer;
     border:6px solid var(--frame); border-radius:18px;
     background:linear-gradient(180deg, #0e141a, #151d24);
-    box-shadow: var(--tile-shadow);
-    transition: transform .22s ease, box-shadow .22s ease;
-    overflow:hidden;
+    box-shadow: var(--tile-shadow); transition: transform .22s ease, box-shadow .22s ease; overflow:hidden;
   }
   .frame::before{
-    content:""; position:absolute; inset:6px;
+    content:""; position:absolute; inset:6px; border-radius:14px;
     background: radial-gradient(120% 130% at 50% 50%, var(--mat) 0%, #0e151c 60%);
-    border-radius:14px;
     box-shadow: inset 0 0 0 1px var(--mat-edge), inset 0 10px 20px rgba(0,0,0,.45);
   }
-  .tile{ position:relative; aspect-ratio: 4 / 3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
+  .tile{ position:relative; aspect-ratio:4/3; border-radius:12px; overflow:hidden; margin:8px; z-index:1; }
   .tile img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
   .frame:hover{ transform: translateY(-4px) scale(1.02); box-shadow: 0 22px 54px rgba(0,0,0,.45) }
   @media (hover:hover){ .frame:hover .tile img{ transform: scale(1.08); } }
-
   .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
   .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
   .meta p{ margin:0; color:#e5fff7; line-height:1.45; }
-
-  .lightbox{
-    position:fixed; inset:0; display:none; place-items:center;
-    background: rgba(3,6,12,.86); z-index:60;
-  }
+  .lightbox{ position:fixed; inset:0; display:none; place-items:center; background: rgba(3,6,12,.86); z-index:60; }
   .lightbox.open{ display:grid; }
   .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
-  .closeBtn{
-    position:fixed; top:16px; right:18px; z-index:61;
-    background:#111923; color:#fff; border:1px solid #3a4856;
-    padding:10px 14px; border-radius:10px; cursor:pointer;
-  }
-
-  .missing{
-    position:absolute; inset:8px; display:grid; place-items:center;
-    border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a;
-    border-radius:12px; font-size:.9rem; text-align:center; padding:8px;
-  }
-
-  /* Captions panel (template generator) */
+  .closeBtn{ position:fixed; top:16px; right:18px; z-index:61; background:#111923; color:#fff; border:1px solid #3a4856; padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .missing{ position:absolute; inset:8px; display:grid; place-items:center; border:2px dashed #ff9a9a; color:#ffd0d0; background:#2a2f3a; border-radius:12px; font-size:.9rem; text-align:center; padding:8px; }
   dialog{ border:1px solid #2e3a46; border-radius:12px; padding:16px; background:#0f1720; color:#eafff7; width:min(920px,96vw) }
   dialog::backdrop{ background:rgba(0,0,0,.55) }
-  textarea{ width:100%; min-height:280px; background:#0b141a; color:#eafff7; border:1px solid #2e3a46; border-radius:8px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.95rem }
+  textarea{ width:100%; min-height:240px; background:#0b141a; color:#eafff7; border:1px solid #2e3a46; border-radius:8px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.95rem }
 </style>
 </head>
 <body>
@@ -119,9 +72,11 @@
     <h1>Animals</h1>
     <p>Modern frames with plaques. Hover to peek; click a frame for full size.</p>
     <div class="actions">
-      <a href="../index.html" class="back-link">← Return to Lobby Map</a>
-      <button class="btn" id="btnTemplate">Captions Template</button>
-      <button class="btn" id="btnDownload">Download captions.json</button>
+      <a href="../index.html" class="linkbtn">← Return to Lobby Map</a>
+      <button class="btn" id="btnPaste">Paste Filenames</button>
+      <button class="btn" id="btnFilesDownload">Download files.json</button>
+      <button class="btn" id="btnCapTemplate">Captions Template</button>
+      <button class="btn" id="btnCapDownload">Download captions.json</button>
     </div>
   </header>
 
@@ -135,77 +90,79 @@
     <img id="lightImg" alt="">
   </div>
 
-  <!-- Captions template dialog -->
-  <dialog id="dlg">
-    <h3 style="margin:0 0 10px">captions.json template (edit then download & upload alongside this page)</h3>
-    <p style="margin:0 0 10px; color:#bfe4d3">Keys are the exact filenames (case-sensitive) located in <code>img/</code>. You may safely change <em>title</em> and <em>desc</em>.</p>
+  <!-- Dialog for pasting filenames -->
+  <dialog id="dlgFiles">
+    <h3 style="margin:0 0 10px">Paste filenames (one per line as shown in Finder)</h3>
+    <textarea id="filesBox"></textarea>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
+      <button class="btn" id="filesApply">Apply</button>
+      <button class="btn" id="filesClose">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Dialog for captions template -->
+  <dialog id="dlgCap">
+    <h3 style="margin:0 0 10px">captions.json template (edit, then download & upload beside this page)</h3>
+    <p style="margin:0 0 10px; color:#bfe4d3">Keys are exact filenames (case-sensitive) in <code>img/</code>. You may change <em>title</em> and <em>desc</em>.</p>
     <textarea id="capText"></textarea>
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
-      <button class="btn" id="dlgClose">Close</button>
+      <button class="btn" id="capClose">Close</button>
     </div>
   </dialog>
 
 <script>
-/**
- * HOW THIS WORKS
- * 1) Place images in: room-Animals/img/
- * 2) Option A (recommended): create files.json (["file1.jpg","file2.png",...])
- *    Option B: edit the inline FILES array below.
- * 3) (Optional) Add captions.json: {"file.jpg":{"title":"New Title","desc":"Write-up..."}}
- *    Titles + descriptions will override the defaults derived from filenames.
- */
-
-const ROOM_NAME = "Animals";
-
-/* ---- Option B fallback list (edit these to your actual filenames) ---- */
+/* ============================================================
+   CONFIG — initial list based on your screenshot (exact names)
+   You can keep this, or paste/overwrite using the UI button.
+   ============================================================ */
 const FILES_FALLBACK = [
-  // Replace with your real filenames in img/
-  "lion_001.jpg",
-  "tiger-forest.png",
-  "eagle 01.JPG",
-  "red-fox.jpeg"
+  "Screen Shot 2025-09-08 at 8.57.00 AM.png",
+  "Screen Shot 2025-09-08 at 8.57.30 AM.png",
+  "Screen Shot 2025-09-08 at 8.57.34 AM.png",
+  "Screen Shot 2025-09-08 at 8.58.29 AM.png",
+  "Screen Shot 2025-09-08 at 9.00.26 AM.png",
+  "Screen Shot 2025-09-08 at 9.00.46 AM.png",
+  "Screen Shot 2025-09-08 at 9.01.14 AM.png",
+  "Screen Shot 2025-09-08 at 9.04.36 AM.png",
+  "Screen Shot 2025-09-08 at 9.05.04 AM.png",
+  "Screen Shot 2025-09-08 at 9.06.16 AM.png",
+  "Screen Shot 2025-09-08 at 9.06.29 AM.png",
+  "Screen Shot 2025-09-08 at 9.07.13 AM.png",
+  "Screen Shot 2025-09-08 at 9.07.45 AM.png",
+  "Screen Shot 2025-09-08 at 9.08.34 AM.png"
 ];
 
-/* Attempt to load files.json; fall back to FILES_FALLBACK if not found */
+/* --- auto-loaders (optional files that override the fallback) --- */
 async function loadFiles(){
   try{
     const r = await fetch('files.json', {cache:'no-store'});
-    if(!r.ok) throw new Error('no files.json');
+    if(!r.ok) throw 0;
     const list = await r.json();
-    if(!Array.isArray(list) || !list.length) throw new Error('files.json empty');
+    if(!Array.isArray(list) || !list.length) throw 0;
     return list;
-  }catch{
-    return FILES_FALLBACK;
-  }
+  }catch{ return FILES_FALLBACK; }
 }
-
-/* Attempt to load captions.json; return {} if not present */
 async function loadCaptions(){
   try{
     const r = await fetch('captions.json', {cache:'no-store'});
-    if(!r.ok) throw new Error('no captions');
+    if(!r.ok) throw 0;
     const map = await r.json();
     return (map && typeof map === 'object') ? map : {};
-  }catch{
-    return {};
-  }
+  }catch{ return {}; }
 }
 
+/* --- rendering helpers --- */
+const ROOM_NAME = "Animals";
 const cardsEl = document.getElementById('cards');
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lightImg');
 const closeBtn = document.getElementById('closeBtn');
-
-function prettyTitle(file){
-  return file.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
-}
 const urlFor = f => `img/${encodeURIComponent(f)}`;
+const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
 
 function buildCard(file, caption){
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Add a description for this artwork in captions.json.";
-  const srcs  = [file]; // single canonical name—recommend ASCII/hyphens; spaces are URL-encoded.
-
   const card = document.createElement('article');
   card.className = 'card';
   card.innerHTML = `
@@ -221,38 +178,28 @@ function buildCard(file, caption){
       <p>${desc}</p>
     </div>
   `;
-
-  const link = card.querySelector('.frame');
   const img  = card.querySelector('img');
   const miss = card.querySelector('.missing');
+  const link = card.querySelector('.frame');
 
-  let i = 0;
-  function tryNext(){
-    if (i >= srcs.length){
-      miss.hidden = false;
-      img.style.objectFit = 'contain';
-      img.style.background = '#2a2f3a';
-      return;
-    }
-    img.src = urlFor(srcs[i++]);
-  }
-  img.addEventListener('error', tryNext);
+  img.addEventListener('error', () => {
+    miss.hidden = false;
+    img.style.objectFit = 'contain';
+    img.style.background = '#2a2f3a';
+  });
   img.addEventListener('load', () => { miss.hidden = true; });
-  tryNext();
 
+  img.src = urlFor(file);
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!img.src) return;
-    openLightbox(img.src, img.alt);
+    if (img.src) openLightbox(img.src, img.alt);
   });
-
   return card;
 }
 
 function openLightbox(src, alt){
   lbImg.src = src; lbImg.alt = alt;
-  lb.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lb.classList.add('open'); document.body.style.overflow = 'hidden';
 }
 function closeLightbox(){
   lb.classList.remove('open'); lbImg.src = '';
@@ -262,53 +209,70 @@ lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
 
-/* ----- Render flow ----- */
+/* --- initial render --- */
 let currentFiles = [];
 let currentCaptions = {};
-
 (async function init(){
   currentFiles = await loadFiles();
   currentCaptions = await loadCaptions();
-
-  // Clear and render
-  cardsEl.innerHTML = '';
-  currentFiles.forEach(f => {
-    const cap = currentCaptions[f] || null;
-    cardsEl.appendChild(buildCard(f, cap));
-  });
+  render();
 })();
-
-/* ----- Captions template & download helpers ----- */
-const btnTemplate = document.getElementById('btnTemplate');
-const btnDownload = document.getElementById('btnDownload');
-const dlg = document.getElementById('dlg');
-const dlgClose = document.getElementById('dlgClose');
-const capText = document.getElementById('capText');
-
-function makeTemplate(){
-  const obj = {};
-  (currentFiles.length ? currentFiles : FILES_FALLBACK).forEach(f => {
-    obj[f] = {
-      title: currentCaptions[f]?.title || prettyTitle(f),
-      desc:  currentCaptions[f]?.desc  || "Write a short artist statement or description here."
-    };
-  });
-  return JSON.stringify(obj, null, 2);
+function render(){
+  cardsEl.innerHTML = '';
+  currentFiles.forEach(f => cardsEl.appendChild(buildCard(f, currentCaptions[f])));
 }
 
-btnTemplate.addEventListener('click', () => {
-  capText.value = makeTemplate();
-  dlg.showModal();
+/* =========================
+   UI: paste filenames / save
+   ========================= */
+const dlgFiles = document.getElementById('dlgFiles');
+const filesBox = document.getElementById('filesBox');
+document.getElementById('btnPaste').addEventListener('click', ()=>{
+  filesBox.value = currentFiles.join('\n');
+  dlgFiles.showModal();
 });
-dlgClose.addEventListener('click', () => dlg.close());
-
-btnDownload.addEventListener('click', () => {
-  const blob = new Blob([makeTemplate()], {type:'application/json'});
+document.getElementById('filesClose').addEventListener('click', ()=> dlgFiles.close());
+document.getElementById('filesApply').addEventListener('click', ()=>{
+  const lines = filesBox.value.split('\n')
+    .map(s=>s.trim()).filter(Boolean);
+  if(lines.length){
+    currentFiles = lines;
+    render();
+  }
+  dlgFiles.close();
+});
+document.getElementById('btnFilesDownload').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(currentFiles, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'captions.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+  const a = Object.assign(document.createElement('a'), {href:url, download:'files.json'});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+/* =========================
+   UI: captions template/save
+   ========================= */
+const dlgCap = document.getElementById('dlgCap');
+const capText = document.getElementById('capText');
+document.getElementById('btnCapTemplate').addEventListener('click', ()=>{
+  const obj = {};
+  currentFiles.forEach(f=>{
+    obj[f] = currentCaptions[f] || {
+      title: prettyTitle(f),
+      desc: "Write a short artist statement or description here."
+    };
+  });
+  capText.value = JSON.stringify(obj, null, 2);
+  dlgCap.showModal();
+});
+document.getElementById('capClose').addEventListener('click', ()=> dlgCap.close());
+document.getElementById('btnCapDownload').addEventListener('click', ()=>{
+  const text = capText.value && capText.value.trim()
+    ? capText.value
+    : JSON.stringify(Object.fromEntries(currentFiles.map(f=>[f,{title:prettyTitle(f),desc:"Write a short artist statement or description here."} ])), null, 2);
+  const blob = new Blob([text], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 });
 </script>
 </body>
