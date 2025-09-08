@@ -82,14 +82,13 @@
   </div>
 
 <script>
-  /* Exact filenames (including the corrected underscore name) */
+  /* EXACT filenames in room-SpaceAndUniverse/img/ */
   const FILES = [
     "IMG_0373.PNG","IMG_0379.PNG","IMG_0383.PNG","Illumination_Vista.png",
     "IMG_0425.PNG","IMG_7021.PNG","IMG_7022.PNG","IMG_7023.PNG",
     "IMG_7024.PNG","IMG_7026.PNG"
   ];
 
-  /* Plaque text */
   const DESCRIPTIONS = {
     "IMG_0373.PNG": "A spiral galaxy rendered as a luminous whirlpool — order emerging from cosmic dust.",
     "IMG_0379.PNG": "A tower of gas and stardust rising like a cathedral spire inside a nebula.",
@@ -108,7 +107,7 @@
 
   function addCard(file){
     const title = pretty(file);
-    // Use encodeURIComponent so any spaces/underscores/etc. are safely handled
+    // Path is relative to this page location: room-SpaceAndUniverse/index.html → img/<file>
     const src   = 'img/' + encodeURIComponent(file);
 
     const article = document.createElement('article');
@@ -124,7 +123,6 @@
       </div>
     `;
 
-    // Lightbox open from the frame
     article.querySelector('.frame').addEventListener('click', (e) => {
       e.preventDefault();
       openLightbox(src, title);
@@ -133,10 +131,10 @@
     cards.appendChild(article);
   }
 
-  // Render cards
+  // Render
   for (const f of FILES) addCard(f);
 
-  /* Lightbox controls */
+  /* Lightbox */
   const lb = document.getElementById('lb');
   const im = document.getElementById('img');
   document.getElementById('c').onclick = closeLightbox;
