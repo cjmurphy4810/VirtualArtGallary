@@ -34,41 +34,34 @@
 
   .shell{ max-width:1200px; margin:0 auto; padding:0 18px 72px }
 
-  /* Stable grid; each card is a self-contained box (no negative margins). */
-  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap:34px; }
+  /* Stable grid (no overlaps) */
+  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(620px, 1fr)); gap:40px; }
 
-  /* Card: image column + label column; alternate with .flip (safe). */
+  /* Each card reserves space for its plaque using padding on the chosen side */
   .card{
-    --mediaW: 380px;
-    display:grid; gap:22px; align-items:start;
-    grid-template-columns: var(--mediaW) 1fr;
-    grid-template-areas: "frame meta";
-  }
-  .card.flip{
-    grid-template-columns: 1fr var(--mediaW);
-    grid-template-areas: "meta frame";
+    --mediaW: 400px;          /* image column width inside the card */
+    --plaqueW: 220px;         /* randomized by JS */
+    --plaqueTop: 14px;        /* randomized by JS */
+    --pl-pad-left: 0px;       /* set when plaque is left */
+    --pl-pad-right: 0px;      /* set when plaque is right */
+    position:relative;
+    padding-left:  var(--pl-pad-left);
+    padding-right: var(--pl-pad-right);
   }
 
-  @media (max-width: 860px){
-    .card, .card.flip{
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "frame"
-        "meta";
-    }
-  }
+  /* The image frame sits centered within the remaining space */
+  .artwrap{ max-width:var(--mediaW); margin:0 auto; }
 
   /* ---------- FRAMES (base + finishes) ---------- */
   .frame{
     --tilt: 0deg;
-    grid-area: frame;
     position:relative; display:block; cursor:pointer;
     border:10px solid var(--frame); border-radius:18px;
     background:linear-gradient(180deg, #0e141a, #151d24);
     box-shadow: var(--tile-shadow), 0 0 0 1px rgba(255,255,255,.05) inset;
     transition: transform .22s ease, box-shadow .22s ease;
     overflow:hidden;
-    transform: rotate(var(--tilt));  /* visual only; does not affect layout box */
+    transform: rotate(var(--tilt));
   }
   .frame::before{
     content:""; position:absolute; inset:8px; border-radius:14px;
@@ -131,17 +124,46 @@
     box-shadow: var(--tile-shadow), 0 10px 26px rgba(34,170,160,.18);
   }
 
-  /* Meta */
-  .meta{ grid-area: meta; min-width:0; } /* prevent overflow */
-  .meta h3{ margin:2px 0 6px; font-size:1.15rem; font-weight:700; color:#fff; }
-  .meta .sub{ margin:0 0 12px; color:var(--subtle); font-size:.95rem; }
-  .meta p{ margin:0; color:#e5fff7; line-height:1.45; }
+  /* ---------- PLAQUE (separate box, floats inside card) ---------- */
+  .plaque{
+    position:absolute; top: var(--plaqueTop); width: var(--plaqueW);
+    transform: rotate(var(--pl-tilt, 0deg));
+    z-index:2;
+    padding:12px 14px;
+    border-radius:12px;
+    line-height:1.35;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    backdrop-filter: blur(2px);
+  }
+  /* pin */
+  .plaque::before{
+    content:""; position:absolute; top:8px; width:8px; height:8px; border-radius:50%;
+    background:#cfcfcf; box-shadow:0 1px 0 rgba(0,0,0,.5);
+  }
+  .pl-left  .plaque{ left:18px; }
+  .pl-right .plaque{ right:18px; }
+  .pl-left  .plaque::before{ left:10px; }
+  .pl-right .plaque::before{ right:10px; }
 
-  /* Lightbox */
-  .lightbox{ position:fixed; inset:0; display:none; place-items:center; background: rgba(3,6,12,.86); z-index:60; }
-  .lightbox.open{ display:grid; }
-  .lightbox img{ max-width:min(96vw,1600px); max-height:92vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,.6) }
-  .closeBtn{ position:fixed; top:16px; right:18px; z-index:61; background:#111923; color:#fff; border:1px solid #3a4856; padding:10px 14px; border-radius:10px; cursor:pointer; }
+  /* Plaque finishes */
+  .pl-brass{ background: linear-gradient(180deg, #3b2f19, #7c6334); color:#f8f0d0; border:1px solid #c9b073; }
+  .pl-ivory{ background: linear-gradient(180deg, #f6f1e3, #e6dcc6); color:#2a2a2a; border:1px solid #e1d4b6; }
+  .pl-slate{ background: linear-gradient(180deg, #1d242c, #12171d); color:#dbe7ff; border:1px solid #2d3946; }
+  .pl-verdigris{ background: linear-gradient(180deg, #0f2f2f, #0b2223); color:#d8fff6; border:1px solid #1e5a59; }
+  .pl-wood{ background: linear-gradient(180deg, #4b2f1c, #352113); color:#ffe8c9; border:1px solid #6a4126; }
+
+  .plaque h3{ margin:0 0 6px; font-size:1.02rem; }
+  .plaque .sub{ margin:0 0 10px; font-size:.9rem; opacity:.85 }
+  .plaque p{ margin:0; font-size:.95rem; }
+
+  /* Phones / narrow: plaque becomes a block below the image; no left/right padding needed */
+  @media (max-width: 860px){
+    .cards{ grid-template-columns: 1fr; }
+    .card{ padding-left: 0; padding-right: 0; }
+    .plaque{ position:static; width:auto; transform:none; margin:12px auto 0; }
+    .plaque::before{ display:none; }
+    .artwrap{ max-width: min(92vw, 520px); }
+  }
 
   /* Missing overlay */
   .missing{
@@ -173,7 +195,7 @@
   </div>
 
 <script>
-/* === Filenames (mixed .png/.PNG fine) === */
+/* === Your files (mixed .png/.PNG OK) === */
 const FILES = [
   "Screen Shot 2025-09-08 at 8.57.00 AM.png",
   "Screen Shot 2025-09-08 at 8.57.30 AM.png",
@@ -210,7 +232,7 @@ const prettyTitle = f => f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(
 const rand = (min,max)=> Math.random()*(max-min)+min;
 const choose = arr => arr[Math.floor(Math.random()*arr.length)];
 
-/* .png ⇄ .PNG & encoded spaces fallback */
+/* filename fallback: .png ⇄ .PNG and encoded spaces */
 function installSmartFallback(img, rawPath){
   const [base, ext] = rawPath.split(/\.(?=[^.]+$)/);
   const toggled = ext === 'png' ? 'PNG' : ext === 'PNG' ? 'png' : null;
@@ -222,28 +244,49 @@ function installSmartFallback(img, rawPath){
   img.addEventListener('error', ()=>{ i+=1; if(i<tries.length) img.src = tries[i]; });
 }
 
-/* Visual variety: shapes & finishes only (no size randomness for stability) */
+/* Frame varieties */
 const SHAPES   = ['shape-a','shape-b','shape-c','shape-d','shape-e','shape-f'];
 const FINISHES = ['finish-gilded','finish-brass','finish-ebony','finish-walnut','finish-verdigris'];
 
-function buildCard(file, caption, index){
+/* Plaque varieties */
+const PLAQUE_FINISHES = ['pl-brass','pl-ivory','pl-slate','pl-verdigris','pl-wood'];
+const PLAQUE_SIDE     = ['pl-left','pl-right'];
+
+function buildCard(file, caption){
   const article = document.createElement('article');
-  article.className = `card ${choose(SHAPES)} ${choose(FINISHES)} ${index % 2 ? 'flip' : ''}`;
+  const side = choose(PLAQUE_SIDE);
+
+  // Random sizes/tilts within safe ranges
+  const mediaW   = Math.round(rand(360, 440));         // frame column width
+  const plaqueW  = Math.round(rand(180, 260));         // plaque width
+  const plaqueTop= Math.round(rand(8, 46));            // plaque vertical offset
+  const tilt     = rand(-0.30, 0.30).toFixed(3) + 'deg';
+  const plTilt   = rand(-0.4, 0.4).toFixed(3) + 'deg';
+
+  article.className = `card ${side} ${choose(SHAPES)} ${choose(FINISHES)}`;
+  article.style.setProperty('--mediaW',  mediaW+'px');
+  article.style.setProperty('--plaqueW', plaqueW+'px');
+  article.style.setProperty('--plaqueTop', plaqueTop+'px');
+  // Reserve space on the chosen side so plaque never overlaps the frame
+  if (side === 'pl-left')  article.style.setProperty('--pl-pad-left',  `calc(var(--plaqueW) + 24px)`);
+  if (side === 'pl-right') article.style.setProperty('--pl-pad-right', `calc(var(--plaqueW) + 24px)`);
 
   const src   = `img/${file}`;
   const title = caption?.title || prettyTitle(file);
   const desc  = caption?.desc  || "Write a short artist statement or description here.";
-  const tilt  = rand(-0.3, 0.3).toFixed(3) + 'deg';
 
   article.innerHTML = `
-    <a href="${src}" class="frame" data-title="${title}" style="--tilt:${tilt}">
-      <div class="tile"><img alt="${title}" decoding="async" loading="lazy"></div>
-    </a>
-    <div class="meta">
+    <div class="artwrap">
+      <a href="${src}" class="frame" data-title="${title}" style="--tilt:${tilt}">
+        <div class="tile"><img alt="${title}" decoding="async" loading="lazy"></div>
+      </a>
+    </div>
+
+    <aside class="plaque ${choose(PLAQUE_FINISHES)}" style="--pl-tilt:${plTilt}">
       <h3>${title}</h3>
       <p class="sub"><strong>${ROOM_NAME}</strong> · <code>${file}</code></p>
       <p>${desc}</p>
-    </div>
+    </aside>
   `;
 
   const tile = article.querySelector('.tile');
@@ -257,9 +300,14 @@ function buildCard(file, caption, index){
     tile.style.setProperty('--ar', `${w} / ${h}`);
   });
 
-  // If every fallback fails, show missing banner (no layout changes)
-  let tries=0;
-  img.addEventListener('error', ()=>{ tries++; if(tries>=3){ const box=document.createElement('div'); box.className='missing'; box.innerHTML='Missing:<br><small><code>'+ (img.currentSrc||src) +'</code></small>'; tile.appendChild(box); img.style.display='none'; }});
+  img.addEventListener('error', ()=>{
+    if (img._failed) return;
+    img._failed = true;
+    const box = document.createElement('div');
+    box.className = 'missing';
+    box.innerHTML = 'Missing:<br><small><code>'+ (img.currentSrc || src) +'</code></small>';
+    tile.appendChild(box); img.style.display='none';
+  });
 
   img.src = src;
 
@@ -273,7 +321,7 @@ function buildCard(file, caption, index){
   return article;
 }
 
-/* Lightbox close */
+/* Lightbox */
 function closeLightbox(){ lb.classList.remove('open'); lbImg.src=''; document.body.style.overflow=''; }
 lb.addEventListener('click', e=>{ if(e.target === lb) closeLightbox(); });
 closeBtn.addEventListener('click', closeLightbox);
@@ -283,8 +331,26 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); 
 (async function init(){
   const captions = await loadCaptions();
   cardsEl.innerHTML = '';
-  FILES.forEach((f,i) => cardsEl.appendChild(buildCard(f, captions[f], i)));
+  FILES.forEach(f => cardsEl.appendChild(buildCard(f, captions[f])));
 })();
+
+/* Caption helpers (you can remove these later) */
+document.getElementById('btnCapTemplate')?.addEventListener('click', ()=>{
+  const obj = {};
+  FILES.forEach(f => { obj[f]={title:prettyTitle(f),desc:"Write a short artist statement or description here."}; });
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+document.getElementById('btnCapDownload')?.addEventListener('click', ()=>{
+  const obj = {};
+  FILES.forEach(f => { obj[f]={title:prettyTitle(f),desc:"Write a short artist statement or description here."}; });
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), {href:url, download:'captions.json'});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
 </script>
 </body>
 </html>
